@@ -22,7 +22,7 @@ class Game:
         self.clock = pygame.time.Clock()
         
         #Font
-        self.font = pygame.font.Font('./Assets/fonts/regular_font.otf',10)
+        self.font = pygame.font.Font('Assets/fonts/regular_font.otf',10)
         self.font.bold = True
         
         self.offset = [0,0]

@@ -25,7 +25,7 @@ class Weapon:
         self._rect.height = 30
         
         # Load a sound file
-        self.soundfile = "./Assets/Sounds/RpgBrust.mp3" 
+        self.soundfile = "Assets/Sounds/RpgBrust.mp3" 
         self.soundeffect = pygame.mixer.Sound(self.soundfile) 
         self.soundChannel = soundChannel 
         
