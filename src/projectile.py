@@ -1,9 +1,9 @@
 import os
-import pygame, sys, math
+import pygame, math
 from animation import Animation
 
 from settings import GRAVITY
-from utils import load_image
+from utils import load_image, load_images
 
 
 class Projectile():
@@ -12,9 +12,9 @@ class Projectile():
         
         #image
         self.image = load_image(f'wepons/{imageFilePath}',scale)
-        self.rect = self.image.get_rect(center = (intialPos[0],intialPos[1]))
-        self.rect.width = max(scale[0],scale[1]) - 2
-        self.rect.height = max(scale[0],scale[1]) - 2
+        self.rect = self.image.get_rect(topleft = (intialPos[0],intialPos[1]))
+        self.rect.width = max(scale[0],scale[1]) - 7    #Adjust rect to be in middle
+        self.rect.height = max(scale[0],scale[1]) - 7   #Adjust rect to be in middle
         
         self.flip = flip
         
@@ -26,7 +26,7 @@ class Projectile():
         self.angle = angle
         self.theta = math.radians(self.angle)
 
-        v = 100
+        v = 140
         self.velocity = [v * math.cos(self.theta), -v * math.sin(self.theta)]   #vx = vcos0 , vy = vsin0
         
     
@@ -37,7 +37,14 @@ class Projectile():
                 collide = True
                 break    
             
-        return collide       
+        return collide  
+    
+    def getExplosionPoint(self):  
+        print(self.velocity)
+        if self.velocity[0] > 0 and self.velocity[1] < 0 : return self.rect.topright
+        if self.velocity[0] < 0 and self.velocity[1] < 0 : return self.rect.topleft
+        if self.velocity[0] < 0 and self.velocity[1] > 0 : return self.rect.bottomleft
+        if self.velocity[0] > 0 and self.velocity[1] > 0 : return self.rect.bottomright
     
     def updateAngle(self):  #get angle with ground ,shiftTan(vy/vx)
         self.angle = -1 * math.atan(self.velocity[1]/self.velocity[0]) * 180 / math.pi      
@@ -51,8 +58,8 @@ class Projectile():
         self.pos[0] = self.pos[0] + self.velocity[0] * self.delta_t
         self.pos[1] = self.pos[1] + self.velocity[1] * self.delta_t
         
-        self.rect[0] = self.pos[0]
-        self.rect[1] = self.pos[1]
+        self.rect[0] = self.pos[0] + 6     #Adjust rect to be in middle
+        self.rect[1] = self.pos[1] + 5     #Adjust rect to be in middle
         
         self.updateAngle()
         #print(math.atan(self.velocity[1]/self.velocity[0]) * 180 / math.pi)
@@ -68,9 +75,10 @@ class Projectile():
 
 class ProjectileController():
     
-    def __init__(self,tileMap):
+    def __init__(self,tileMap,explosions):
         
         self.tileMap = tileMap
+        self.explosions:list[Explosion] = explosions
         self.missiles:list[Projectile] = []
         
     def addMissile(self,projectile:Projectile):
@@ -78,9 +86,20 @@ class ProjectileController():
         
     def update(self):
         for missile in self.missiles:
-            if(missile.pos[1] > 2000) or missile.detectCollision(self.tileMap):
+                      
+            if(missile.pos[1] > 2000):
                 print('projectile removed')
                 self.missiles.remove(missile)
+                continue
+            
+            if(missile.detectCollision(self.tileMap)):
+                print("explosion")                
+                ex1 = Explosion("explosion",missile.getExplosionPoint())
+                ex2 = Explosion("explosion",[missile.getExplosionPoint()[0] - 2,missile.getExplosionPoint()[1] - 3])
+                self.explosions.append(ex1)
+                self.explosions.append(ex2)
+                self.missiles.remove(missile)
+                continue
             
             missile.update()
             
@@ -89,15 +108,15 @@ class ProjectileController():
             missile.render(screen,renderOffset)  
                         
 
-
 class Explosion:
     
-    def __init__(self,folderPath):
+    def __init__(self,folderPath,pos):
         
-        self.images = self.loadImages(folderPath)
-        self.animation = Animation(self.images,12)
-    
-    def loadImages(self,folderPath):
-        return [load_image(f) for f in os.listdir(folderPath) if os.path.isfile(os.path.join(folderPath, f))]
+        self.images = load_images(folderPath,(20,20))
+        self.animation = Animation(self.images,6)
+        self.pos = pos
+        
+    def render(self,screen,offset):
+        screen.blit(self.animation.getImage(),(self.pos[0] - offset[0],self.pos[1] - offset[1]))
         
         

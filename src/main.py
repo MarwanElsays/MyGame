@@ -2,7 +2,7 @@ import math
 import sys
 import pygame
 from enemy import Enemy
-from projectile import ProjectileController
+from projectile import Explosion, ProjectileController
 from utils import load_image
 from player import Player
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH
@@ -36,7 +36,10 @@ class Game:
         #Enemy
         self.enemy = [Enemy(1,0.3,self.map),Enemy(1,0.3,self.map),Enemy(1,0.3,self.map),Enemy(1,0.3,self.map)]
         
-        self.controlProjectile = ProjectileController(self.map)
+        #Explosions
+        self.explosions:list[Explosion]= []
+        
+        self.controlProjectile = ProjectileController(self.map,self.explosions)
         
         # Load sounds into a single channel
         self.channel = pygame.mixer.Channel(1)
@@ -45,8 +48,9 @@ class Game:
         rpg = Weapon("rpg.png",(30,10),self.player,45,self.controlProjectile,self.channel,[300,134])
         rpg2 = Weapon("rpg2.png",(30,17),self.player,0,self.controlProjectile,self.channel,[250,134])
         
+        #weapons
         self.weapons = [rpg,rpg2]
-        
+               
         
     def run(self): 
         
@@ -76,11 +80,20 @@ class Game:
             #wepon
             for weapon in self.weapons:
                 weapon.update()
-                weapon.render(self.display,renderOffset)  
-                   
+                weapon.render(self.display,renderOffset)                      
             
+            #Projectiles
             self.controlProjectile.update()
             self.controlProjectile.render(self.display,renderOffset)
+            
+            #explosions
+            for exp in self.explosions:
+                exp.animation.update()
+                if(exp.animation.done):
+                    self.explosions.remove(exp)
+                else:
+                    exp.render(self.display,renderOffset)  
+                    
             
             # #health Text
             # healthTextSurface = self.font.render("Health", True, (255,0,0))
