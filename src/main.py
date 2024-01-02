@@ -5,7 +5,7 @@ from enemy import Enemy
 from projectile import Explosion, ProjectileController
 from utils import load_image
 from player import Player
-from settings import SCREEN_HEIGHT, SCREEN_WIDTH
+from settings import SCREEN_HEIGHT, SCREEN_WIDTH, SCREENSCALE
 from tileMap import tileMap
 from weapon import Weapon
 
@@ -31,22 +31,22 @@ class Game:
         self.map = tileMap("Assets/maps/map0.json")
         
         #Player
-        self.player = Player(3,0.3,self.map)
+        self.player = Player(5,0.3,self.map)
         
         #Enemy
         self.enemy = [Enemy(1,0.3,self.map),Enemy(1,0.3,self.map),Enemy(1,0.3,self.map),Enemy(1,0.3,self.map)]
         
-        #Explosions
+         #Explosions
         self.explosions:list[Explosion]= []
         
-        self.controlProjectile = ProjectileController(self.map,self.explosions)
+        self.controlProjectile = ProjectileController(self.map,self.enemy,self.explosions)
         
         # Load sounds into a single channel
         self.channel = pygame.mixer.Channel(1)
                       
         #wepon
-        rpg = Weapon("rpg.png",(30,10),self.player,45,self.controlProjectile,self.channel,[300,134])
-        rpg2 = Weapon("rpg2.png",(30,17),self.player,0,self.controlProjectile,self.channel,[250,134])
+        rpg = Weapon("rpg.png",(30,15),self.player,45,self.controlProjectile,self.channel,[300,134])
+        rpg2 = Weapon("rpg2.png",(30,22),self.player,0,self.controlProjectile,self.channel,[250,134])
         
         #weapons
         self.weapons = [rpg,rpg2]
@@ -59,8 +59,8 @@ class Game:
             self.display.fill(self.backGC)
             #self.display.blit(self.BackGroundImage, (0, 0)) 
                         
-            self.offset[0] += (self.player.rect.centerx - SCREEN_WIDTH/6 - self.offset[0])/15
-            self.offset[1] += (self.player.rect.centery - SCREEN_HEIGHT/6 - self.offset[1])/15
+            self.offset[0] += (self.player.rect.centerx - SCREEN_WIDTH/4 - self.offset[0])/15
+            self.offset[1] += (self.player.rect.centery - SCREEN_HEIGHT/4 - self.offset[1])/15
 
             renderOffset = (int(self.offset[0]),int(self.offset[1]))
                         
@@ -113,7 +113,7 @@ class Game:
                         self.player.launchMissile()
             
                     
-            self.screen.blit(pygame.transform.scale(self.display, (3*self.screen.get_size()[0],3*self.screen.get_size()[1])), (0, 0))
+            self.screen.blit(pygame.transform.scale(self.display,(SCREENSCALE*self.screen.get_size()[0],SCREENSCALE*self.screen.get_size()[1])), (0, 0))
               
             pygame.display.update()
             self.clock.tick(60)

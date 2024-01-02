@@ -26,25 +26,37 @@ class Projectile():
         self.angle = angle
         self.theta = math.radians(self.angle)
 
-        v = 140
+        v = 240
         self.velocity = [v * math.cos(self.theta), -v * math.sin(self.theta)]   #vx = vcos0 , vy = vsin0
+    
+    
+    def setForceY(self,forceY):
+        self.force[1] = forceY
         
     
-    def detectCollision(self,tileMap):
+    def detectCollision(self,tileMap,enemies):
         collide = False
         for rect in tileMap.getAroundTiles(self.rect.center): 
             if rect.colliderect(self.rect):
                 collide = True
-                break    
-            
+                break
+        
+        if not collide:
+            for enemy in enemies:
+                if enemy.rect.colliderect(self.rect):
+                    collide = True
+                    break
+                    
         return collide  
     
     def getExplosionPoint(self):  
-        print(self.velocity)
         if self.velocity[0] > 0 and self.velocity[1] < 0 : return self.rect.topright
         if self.velocity[0] < 0 and self.velocity[1] < 0 : return self.rect.topleft
         if self.velocity[0] < 0 and self.velocity[1] > 0 : return self.rect.bottomleft
         if self.velocity[0] > 0 and self.velocity[1] > 0 : return self.rect.bottomright
+        #for Horizontal Projectiles
+        if self.velocity[0] > 0 : return (self.rect.right,int(self.rect.top + self.rect.height/2))
+        else : return (self.rect.left,int(self.rect.top + self.rect.height/2))
     
     def updateAngle(self):  #get angle with ground ,shiftTan(vy/vx)
         self.angle = -1 * math.atan(self.velocity[1]/self.velocity[0]) * 180 / math.pi      
@@ -62,6 +74,7 @@ class Projectile():
         self.rect[1] = self.pos[1] + 5     #Adjust rect to be in middle
         
         self.updateAngle()
+        print(self.rect)
         #print(math.atan(self.velocity[1]/self.velocity[0]) * 180 / math.pi)
         #print(self.velocity)
         
@@ -75,10 +88,11 @@ class Projectile():
 
 class ProjectileController():
     
-    def __init__(self,tileMap,explosions):
+    def __init__(self,tileMap,enemies,explosions):
         
         self.tileMap = tileMap
         self.explosions:list[Explosion] = explosions
+        self.enemies = enemies
         self.missiles:list[Projectile] = []
         
     def addMissile(self,projectile:Projectile):
@@ -87,12 +101,12 @@ class ProjectileController():
     def update(self):
         for missile in self.missiles:
                       
-            if(missile.pos[1] > 2000):
+            if(missile.pos[1] > 4000):
                 print('projectile removed')
                 self.missiles.remove(missile)
                 continue
             
-            if(missile.detectCollision(self.tileMap)):
+            if(missile.detectCollision(self.tileMap,self.enemies)):
                 print("explosion")                
                 ex1 = Explosion("explosion",missile.getExplosionPoint())
                 ex2 = Explosion("explosion",[missile.getExplosionPoint()[0] - 2,missile.getExplosionPoint()[1] - 3])

@@ -1,8 +1,8 @@
 import math
 import pygame
 from animation import Animation
-from utils import load_image,load_images
-from settings import TILE_SIZE
+from utils import load_images
+from settings import SCALE
 from weapon import Weapon
 
 class Player():
@@ -20,7 +20,7 @@ class Player():
         
         #animation
         self.flip = False    
-        self.scale = (16,20)  
+        self.scale = (SCALE*16,SCALE*20)  
         self.Animations = {"idle" : Animation(load_images('Player/idle',self.scale),10,'idle'),
                            "jump" : Animation(load_images('Player/jump',self.scale),10,'jump'),
                            "run" : Animation(load_images('Player/run',self.scale),5,'run'),
@@ -29,7 +29,7 @@ class Player():
         
         self.currAnimation =  self.Animations['idle']
         self.image = self.currAnimation.getImage()
-        self.rect = self.image.get_rect(center = (300, 100))
+        self.rect = self.image.get_rect(center = (300, 200))
         
         #Slide
         self.slide = 0

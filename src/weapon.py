@@ -69,7 +69,7 @@ class Weapon:
                 self._pos = [self._player.rect.center[0]-10,self._player.rect.center[1]-10]
             else:
                 self._flip = False
-                self._pos = [self._player.rect.center[0],self._player.rect.center[1]-10]
+                self._pos = [self._player.rect.center[0]-10,self._player.rect.center[1]-10]
         else:
             self._floatAngle+=1
             self._floatAngle%=360
@@ -80,6 +80,7 @@ class Weapon:
     def launch(self):
         missileAngle = 180 - self._equipedAngle  if self._flip else self._equipedAngle
         missile = Projectile(1,"missile.png",(20,14),missileAngle,self._flip,self._pos)
+        missile.setForceY(0)
         #self.soundChannel.play(self.soundeffect)
         self.soundeffect.play()
         self.projectileController.addMissile(missile)

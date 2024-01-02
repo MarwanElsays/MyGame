@@ -22,7 +22,7 @@ class Enemy():
         
         self.currAnimation =  self.Animations['idle']
         self.image = self.currAnimation.getImage()
-        self.rect = self.image.get_rect(center = (300,240))
+        self.rect = self.image.get_rect(center = (300,190))
         
         self.changeDirCnt = 0
                 

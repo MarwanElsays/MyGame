@@ -17,8 +17,8 @@ class tileMap:
         self.Tiles = []
         
         self.TilesImages = {
-            "rockyGround" : load_images('tiles/rockyGround'),
-            "Grass" : load_images('tiles/Grass')
+            "rockyGround" : load_images('tiles/rockyGround',scale=(TILE_SIZE,TILE_SIZE)),
+            "Grass" : load_images('tiles/Grass',scale=(TILE_SIZE,TILE_SIZE))
         }
         
         self.LoadMap(path)
