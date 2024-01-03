@@ -5,7 +5,7 @@ import random
 from settings import TILE_SIZE
 
 class Enemy():
-    def __init__(self,speedx,gravity,tileMap):
+    def __init__(self,speedx,gravity,intialPos,tileMap):
         self.speedX = speedx
         self.speedY = 0
         self.tileMap = tileMap
@@ -22,7 +22,7 @@ class Enemy():
         
         self.currAnimation =  self.Animations['idle']
         self.image = self.currAnimation.getImage()
-        self.rect = self.image.get_rect(center = (300,190))
+        self.rect = self.image.get_rect(center = intialPos)
         
         self.changeDirCnt = 0
                 

@@ -42,10 +42,10 @@ class Projectile():
                 break
         
         if not collide:
-            for enemy in enemies:
+            for enemy in enemies.copy():
                 if enemy.rect.colliderect(self.rect):
                     collide = True
-                    break
+                    enemies.remove(enemy)
                     
         return collide  
     
@@ -74,7 +74,6 @@ class Projectile():
         self.rect[1] = self.pos[1] + 5     #Adjust rect to be in middle
         
         self.updateAngle()
-        print(self.rect)
         #print(math.atan(self.velocity[1]/self.velocity[0]) * 180 / math.pi)
         #print(self.velocity)
         
@@ -91,27 +90,25 @@ class ProjectileController():
     def __init__(self,tileMap,enemies,explosions):
         
         self.tileMap = tileMap
-        self.explosions:list[Explosion] = explosions
+        self.explosions:set[Explosion] = explosions
         self.enemies = enemies
-        self.missiles:list[Projectile] = []
+        self.missiles:set[Projectile] = set()
         
     def addMissile(self,projectile:Projectile):
-        self.missiles.append(projectile)
+        self.missiles.add(projectile)
         
     def update(self):
-        for missile in self.missiles:
+        
+        for missile in self.missiles.copy():
                       
             if(missile.pos[1] > 4000):
                 print('projectile removed')
                 self.missiles.remove(missile)
                 continue
             
-            if(missile.detectCollision(self.tileMap,self.enemies)):
-                print("explosion")                
-                ex1 = Explosion("explosion",missile.getExplosionPoint())
-                ex2 = Explosion("explosion",[missile.getExplosionPoint()[0] - 2,missile.getExplosionPoint()[1] - 3])
-                self.explosions.append(ex1)
-                self.explosions.append(ex2)
+            if(missile.detectCollision(self.tileMap,self.enemies)):              
+                self.explosions.add(Explosion("explosion",missile.getExplosionPoint()))
+                #self.explosions.add(Explosion("explosion",[missile.getExplosionPoint()[0] - 2,missile.getExplosionPoint()[1] - 3]))
                 self.missiles.remove(missile)
                 continue
             

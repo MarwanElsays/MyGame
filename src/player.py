@@ -14,6 +14,10 @@ class Player():
         self.dir = [0,0]
         self.collision = [0,0,0,0]  #down,top,left,right
         
+        #health
+        MAXHEALTH = 100
+        self.health = MAXHEALTH/2
+        
         #Jumps
         self.jumps = 2
         self.canJump = True
@@ -76,7 +80,7 @@ class Player():
             self.canSlide = False
         
         if(keys[pygame.K_SPACE] and self.jumps > 0 and self.canJump): 
-            self.speedY = -6
+            self.speedY = -6*SCALE
             self.collision[0] = 0
             self.jumps-=1
             self.canJump = False
@@ -86,11 +90,7 @@ class Player():
             
         if(not keys[pygame.K_x]):
             self.canSlide = True
-                         
-        # if(keys[pygame.K_e]):
-        #     self.equipping = not self.equipping
-     
-      
+                               
     def launchMissile(self):
         if (self.__wepon is not None):
             self.__wepon.launch()    
@@ -190,7 +190,7 @@ class Player():
         else:
             if(not self.canClimb):
                 self.speedY += self.gravity
-                self.speedY = min(9,self.speedY)  
+                self.speedY = min(9*SCALE,self.speedY)  
                
         self.getAnimation() 
 
