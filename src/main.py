@@ -31,13 +31,13 @@ class Game:
         #Map
         self.map = tileMap("Assets/maps/map0.json")
         
+        
         #Player
         self.player = Player(5,0.3,self.map)
         
         #Enemy
         self.enemy = {Enemy(1,0.3,(300,540),self.map) for i in range (300)}
-                
-        pygame.quit()
+      
         #Explosions
         self.explosions:set[Explosion] = set()
         

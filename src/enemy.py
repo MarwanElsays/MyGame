@@ -2,7 +2,7 @@ import pygame
 from animation import Animation
 from utils import load_image,load_images
 import random
-from settings import TILE_SIZE
+from settings import SCALE, TILE_SIZE
 
 class Enemy():
     def __init__(self,speedx,gravity,intialPos,tileMap):
@@ -15,7 +15,7 @@ class Enemy():
                 
         #animation
         self.flip = False    
-        self.scale = (16,20)  
+        self.scale = (16, 20)  
         self.Animations = {"idle" : Animation(load_images('Enemy/idle',self.scale),10,'idle'),
                            "run" : Animation(load_images('Enemy/run',self.scale),5,'run')
                             }

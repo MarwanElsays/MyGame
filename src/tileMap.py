@@ -22,6 +22,8 @@ class tileMap:
         }
         
         self.LoadMap(path)
+        
+        print(len(self.map))
     
     def LoadMap(self,path):
         f = open(path, 'r')

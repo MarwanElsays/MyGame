@@ -80,7 +80,7 @@ class Weapon:
     def launch(self):
         missileAngle = 180 - self._equipedAngle  if self._flip else self._equipedAngle
         missile = Projectile(1,"missile.png",(20,14),missileAngle,self._flip,self._pos)
-        missile.setForceY(0)
+        #missile.setForceY(0)
         #self.soundChannel.play(self.soundeffect)
         self.soundeffect.play()
         self.projectileController.addMissile(missile)
