@@ -20,16 +20,19 @@ class Game:
         
         self.Tiles = {
             "rockyGround" : load_images('tiles/rockyGround'),
-            "Grass" : load_images('tiles/Grass')
+            "Grass" : load_images('tiles/Grass'),
+            "Alien" : load_images('tiles/Alien',(TILE_SIZE,TILE_SIZE)),
+            "Chests": load_images('/chests',(TILE_SIZE,TILE_SIZE)),
         }
          
         self.TilesAsList = list(self.Tiles)
+        print(len(self.Tiles))
         self.tileType = 0 
         self.variant = 0       
         self.speed = [0,0]
         self.pos = [self.width/2,self.height/2]
         self.TilesDrawn = self.LoadMap('Assets/maps/map0.json')
-        
+            
     def getpos(self,pos):
         newPos = (int(pos[0]/TILE_SIZE),int(pos[1]/TILE_SIZE))
         return newPos
@@ -67,6 +70,7 @@ class Game:
         if(Mouse[0]):
             self.TilesDrawn[tilekey] = {'type':self.TilesAsList[self.tileType],'variant':self.variant,'pos':newpos}
             print(tilekey)   
+            print((mousePos[0] + renderOffset[0],mousePos[1] + renderOffset[1]))
             
         elif(Mouse[2]):
             if(tilekey in self.TilesDrawn):
@@ -114,6 +118,7 @@ class Game:
                         self.variant%=len(self.Tiles[self.TilesAsList[self.tileType]])
                     if events.key == pygame.K_t:
                         self.tileType+=1
+                        self.variant = 0
                         self.tileType%=len(self.TilesAsList)
                     if events.key == pygame.K_s:
                         print("DATA SAVED")

@@ -2,6 +2,7 @@ import math
 import sys
 import time
 import pygame
+from button import Button
 from enemy import Enemy
 from projectile import Explosion, ProjectileController
 from utils import load_image
@@ -14,7 +15,7 @@ class Game:
     
     def __init__(self):
         pygame.init()
-        self.backGC = '#C4FAF8'
+        self.backGC = '#000999'
         self.screen = pygame.display.set_mode((SCREEN_WIDTH , SCREEN_HEIGHT))
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.BackGroundImage = load_image('background.png')
@@ -36,7 +37,7 @@ class Game:
         self.player = Player(5,0.3,self.map)
         
         #Enemy
-        self.enemy = {Enemy(1,0.3,(300,540),self.map) for i in range (300)}
+        self.enemy = {Enemy(1,0.3,(2547, 620),self.map) for i in range (300)}
       
         #Explosions
         self.explosions:set[Explosion] = set()
@@ -52,6 +53,8 @@ class Game:
         
         #weapons
         self.weapons = [rpg,rpg2]
+                
+        self.tree  =  pygame.image.load('Assets/images/tiles/Trees/Tree1.png').convert_alpha()
                
         
     def run(self): 
@@ -95,13 +98,16 @@ class Game:
                     self.explosions.remove(exp)
                 else:
                     exp.render(self.display,renderOffset)  
-                    
+                                      
             
             #health Text
             healthTextSurface = self.font.render("Health", False,  (0, 0, 0))
             self.display.blit(healthTextSurface, healthTextSurface.get_rect(topleft = (265,3))) 
             pygame.draw.rect(self.display, (255,255,200), pygame.Rect(295, 5, 100, 8)) 
             pygame.draw.rect(self.display, (255,0,0), pygame.Rect(295, 5, self.player.health, 8))
+            
+            
+            # self.display.blit(self.tree,( 300 - renderOffset[0],400 - renderOffset[1]))
                    
             
             for events in pygame.event.get():

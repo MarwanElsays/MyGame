@@ -1,7 +1,7 @@
 from PIL import Image
 import os
 
-colors = {(141, 146, 172):(0, 0, 0)}
+colors = {(255, 255, 255):(0, 0, 0)}
 
 def change_color(image_path,output_path):
     # Open the image
@@ -46,10 +46,10 @@ def change_color_folder(folder_path,output_folder):
 
 
 if __name__ == "__main__" :
-    # input_folder_path = "C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/Images/Player/run"
-    # output_folder_path = "C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/Images/Enemy/run"
+    input_folder_path = "C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/Images/tiles"
+    output_folder_path = "C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/Images/tiles"
     
-    # change_color_folder(input_folder_path, output_folder_path)
+    change_color_folder(input_folder_path, output_folder_path)
     
-    change_color("C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/Images/wepons/diamondSword.png","output_path.png")
+    #change_color("C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/Images/tiles/Alien/ground_1.png","output_path.png")
 

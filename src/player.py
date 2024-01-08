@@ -193,6 +193,7 @@ class Player():
                 self.speedY = min(9*SCALE,self.speedY)  
                
         self.getAnimation() 
+        
 
     def render(self,screen,offset):
         screen.blit(pygame.transform.flip(self.image,self.flip,False),(self.rect.x - offset[0]+self.slideoffset,self.rect.y - offset[1]))
