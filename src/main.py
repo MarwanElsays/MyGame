@@ -56,7 +56,7 @@ class Game:
                 
         self.tree  =  pygame.image.load('Assets/images/tiles/Trees/Tree1.png').convert_alpha()
                
-        
+            
     def run(self): 
         
         while True:
