@@ -1,4 +1,3 @@
-import math
 import pygame
 from animation import Animation
 from utils import load_images
@@ -6,197 +5,210 @@ from settings import SCALE
 from weapon import Weapon
 
 class Player():
-    def __init__(self,speedx,gravity,tileMap):
-        self.speedX = speedx
-        self.speedY = 0
-        self.tileMap = tileMap
-        self.gravity = gravity
-        self.dir = [0,0]
-        self.collision = [0,0,0,0]  #down,top,left,right
+    def __init__(self,speedx,gravity,tile_map):
+        self.__speedX ,self.__speedY = speedx, 0
+        self.__tile_map = tile_map
+        self.__gravity = gravity
+        self.__dir = [0,0]
+        self.__collision = [0,0,0,0]  #down,top,left,right
         
         #health
         MAXHEALTH = 100
-        self.health = MAXHEALTH/2
+        self.__health = MAXHEALTH/2
         
         #Jumps
-        self.jumps = 2
-        self.canJump = True
+        self.__jumps = 2
+        self.__can_jump = True
         
         #animation
-        self.flip = False    
-        self.scale = (SCALE*16,SCALE*20)  
-        self.Animations = {"idle" : Animation(load_images('Player/idle',self.scale),10,'idle'),
-                           "jump" : Animation(load_images('Player/jump',self.scale),10,'jump'),
-                           "run" : Animation(load_images('Player/run',self.scale),5,'run'),
-                           "slide" : Animation(load_images('Player/slide',self.scale),10,'slide'),
-                           "wall_slide" : Animation(load_images('Player/wall_slide',self.scale),10,'wall_slide')}
+        self.__flip = False    
+        self.__scale = (SCALE*16,SCALE*20)  
+        self.__animations = {"idle" : Animation(load_images('Player/idle',self.__scale),10,'idle'),
+                           "jump" : Animation(load_images('Player/jump',self.__scale),10,'jump'),
+                           "run" : Animation(load_images('Player/run',self.__scale),5,'run'),
+                           "slide" : Animation(load_images('Player/slide',self.__scale),10,'slide'),
+                           "wall_slide" : Animation(load_images('Player/wall_slide',self.__scale),10,'wall_slide')}
         
-        self.currAnimation =  self.Animations['idle']
-        self.image = self.currAnimation.getImage()
-        self.rect = self.image.get_rect(center = (300, 200))
+        self.__curr_animation =  self.__animations['idle']
+        self.__image = self.__curr_animation.getImage()
+        self.__rect = self.__image.get_rect(center = (300, 200))
         
         #Slide
-        self.slide = 0
-        self.slideTime = 30
-        self.slideoffset = 0
-        self.canSlide = False
-        self.slideCnt = 0
+        self.__slide = 0
+        self.__slide_time = 30
+        self.__slide_offset = 0
+        self.__can_slide = False
+        self.__slide_cnt = 0
         
         #climb
-        self.canClimb = False
+        self.__can_climb = False
         
         #Wepon
         self.__wepon:Weapon= None
-        self.equipping = False
-        
-        
-    def setWepon(self,wepon):
+        self.__equipping = False
+    
+    def get_health(self):
+        return self.__health
+    
+    def get_flip(self):
+        return self.__flip
+    
+    def get_rect(self):
+        return self.__rect
+    
+    def set_equipping(self,equipping):
+        self.__equipping = equipping
+      
+    def get_equipping(self):
+        return self.__equipping
+    
+    def set_wepon(self,wepon):
         self.__wepon = wepon
         
-    def getWepon(self)->Weapon:
+    def get_wepon(self)->Weapon:
         return self.__wepon
             
-    def getInput(self):
+    def get_input(self):
         
         keys = pygame.key.get_pressed()
         if(keys[pygame.K_RIGHT]): 
-            self.dir[0] = 1
-            self.flip = False
+            self.__dir[0] = 1
+            self.__flip = False
         elif(keys[pygame.K_LEFT]): 
-            self.dir[0] = -1
-            self.flip = True
+            self.__dir[0] = -1
+            self.__flip = True
             
         else:
-            self.dir[0] = 0
+            self.__dir[0] = 0
             
         if(keys[pygame.K_UP]): 
-            self.canClimb = True
+            self.__can_climb = True
         else:
-            self.canClimb = False
+            self.__can_climb = False
             
-        if(keys[pygame.K_x] and self.dir[0] != 0 and self.canSlide):
-            self.slide = 1
-            self.slideCnt = 0
-            self.canSlide = False
+        if(keys[pygame.K_x] and self.__dir[0] != 0 and self.__can_slide):
+            self.__slide = 1
+            self.__slide_cnt = 0
+            self.__can_slide = False
         
-        if(keys[pygame.K_SPACE] and self.jumps > 0 and self.canJump): 
-            self.speedY = -6*SCALE
-            self.collision[0] = 0
-            self.jumps-=1
-            self.canJump = False
+        if(keys[pygame.K_SPACE] and self.__jumps > 0 and self.__can_jump): 
+            self.__speedY = -6*SCALE
+            self.__collision[0] = 0
+            self.__jumps-=1
+            self.__can_jump = False
             
         if(not keys[pygame.K_SPACE]):
-            self.canJump = True
+            self.__can_jump = True
             
         if(not keys[pygame.K_x]):
-            self.canSlide = True
+            self.__can_slide = True
                                
-    def launchMissile(self):
+    def launch_missile(self):
         if (self.__wepon is not None):
             self.__wepon.launch()    
                                 
-    def getAnimation(self):
-        newAnim = ''
+    def get_animation(self):
+        new_anim = ''
         
-        if(not self.collision[0]):
-            if((self.collision[2] or self.collision[3])):
-                if(self.canClimb):
-                    newAnim = 'idle'   # need to add climb animation
+        if(not self.__collision[0]):
+            if((self.__collision[2] or self.__collision[3])):
+                if(self.__can_climb):
+                    new_anim = 'idle'   # need to add climb animation
                 else:
-                    if(self.speedY > 0):
-                        newAnim = 'wall_slide'
-                        self.slideoffset = 3 * self.dir[0]
+                    if(self.__speedY > 0):
+                        new_anim = 'wall_slide'
+                        self.__slide_offset = 3 * self.__dir[0]
                     else:
-                        newAnim = 'jump'
-                        self.slideoffset = 0
+                        new_anim = 'jump'
+                        self.__slide_offset = 0
             else:
-                newAnim = 'jump'
-                self.slideoffset = 0
+                new_anim = 'jump'
+                self.__slide_offset = 0
                 
-        elif(self.slide):
-            newAnim = 'slide'
-        elif(self.dir[0] == 0):
-            newAnim = 'idle'
+        elif(self.__slide):
+            new_anim = 'slide'
+        elif(self.__dir[0] == 0):
+            new_anim = 'idle'
         else:
-            newAnim = 'run'
+            new_anim = 'run'
             
-        if(newAnim == self.currAnimation.status):
-            self.currAnimation.update()
+        if(new_anim == self.__curr_animation.status):
+            self.__curr_animation.update()
         else:
-            self.currAnimation.imageIdx = 0
-            self.currAnimation = self.Animations[newAnim]
+            self.__curr_animation.imageIdx = 0
+            self.__curr_animation = self.__animations[new_anim]
             
-        self.image = self.currAnimation.getImage()
+        self.__image = self.__curr_animation.getImage()
         
-    def Controlslide(self):
-        self.slideCnt+=1
-        if(self.slideCnt >= self.slideTime):
-            self.slide = 0
-            self.slideCnt = self.slideTime 
+    def control_slide(self):
+        self.__slide_cnt+=1
+        if(self.__slide_cnt >= self.__slide_time):
+            self.__slide = 0
+            self.__slide_cnt = self.__slide_time 
                  
     def update(self):
-        self.collision = [0,0,0,0]
+        self.__collision = [0,0,0,0]
         
-        self.getInput()
+        self.get_input()
     
-        self.Controlslide()
-        if(self.slide):
-            self.rect.x += self.dir[0] * self.speedX * 2 
+        self.control_slide()
+        if(self.__slide):
+            self.__rect.x += self.__dir[0] * self.__speedX * 2 
         else:
-            self.rect.x += self.dir[0] * self.speedX 
+            self.__rect.x += self.__dir[0] * self.__speedX 
              
-        for rect in self.tileMap.getAroundTiles(self.rect.center):
-            if(self.rect.colliderect(rect)):
-                if(self.dir[0] == 1):
-                    self.collision[3] = 1
-                    self.rect.right = rect.left
-                if(self.dir[0] == -1):
-                    self.collision[2] = 1
-                    self.rect.left = rect.right
-                self.slide = 0
+        for rect in self.__tile_map.getAroundTiles(self.__rect.center):
+            if(self.__rect.colliderect(rect)):
+                if(self.__dir[0] == 1):
+                    self.__collision[3] = 1
+                    self.__rect.right = rect.left
+                if(self.__dir[0] == -1):
+                    self.__collision[2] = 1
+                    self.__rect.left = rect.right
+                self.__slide = 0
                                       
-        self.rect.y += self.speedY         
-        colRect = pygame.rect.Rect(self.rect)
-        if(self.speedY < 0.5 and self.speedY >= 0): colRect.y+=1
+        self.__rect.y += self.__speedY         
+        colRect = pygame.rect.Rect(self.__rect)
+        if(self.__speedY < 0.5 and self.__speedY >= 0): colRect.y+=1
     
-        for rect in self.tileMap.getAroundTiles(self.rect.center):
+        for rect in self.__tile_map.getAroundTiles(self.__rect.center):
             if(colRect.colliderect(rect)):
-                if(self.speedY >= 0):
-                    self.collision[0] = 1
+                if(self.__speedY >= 0):
+                    self.__collision[0] = 1
                     colRect.bottom = rect.top
-                if(self.speedY < 0):
-                    self.collision[1] = 1
+                if(self.__speedY < 0):
+                    self.__collision[1] = 1
                     colRect.top = rect.bottom
-                self.rect = colRect
-                self.speedY = 0                     
+                self.__rect = colRect
+                self.__speedY = 0                     
                           
                           
-        if(self.collision[1]):  #upWall bounce
-            self.speedY+=2
+        if(self.__collision[1]):  #upWall bounce
+            self.__speedY+=2
         
-        if((self.collision[2] or self.collision[3]) and self.speedY > 0): #wallSlide
-            if(self.canClimb):
-                self.speedY = -3
+        if((self.__collision[2] or self.__collision[3]) and self.__speedY > 0): #wallSlide
+            if(self.__can_climb):
+                self.__speedY = -3
             else:
-                self.speedY = 1
+                self.__speedY = 1
 
         #if player is not on left or right Wall then he cant climb
-        if(not(self.collision[2] or self.collision[3])): 
-            self.canClimb = False
+        if(not(self.__collision[2] or self.__collision[3])): 
+            self.__can_climb = False
                     
-        if(self.collision[0]): 
-            self.jumps = 2   
-            self.canClimb = False     #prevent player from climbing when on ground
+        if(self.__collision[0]): 
+            self.__jumps = 2   
+            self.__can_climb = False     #prevent player from climbing when on ground
         else:
-            if(not self.canClimb):
-                self.speedY += self.gravity
-                self.speedY = min(9*SCALE,self.speedY)  
+            if(not self.__can_climb):
+                self.__speedY += self.__gravity
+                self.__speedY = min(9*SCALE,self.__speedY)  
                
-        self.getAnimation() 
+        self.get_animation() 
         
 
     def render(self,screen,offset):
-        screen.blit(pygame.transform.flip(self.image,self.flip,False),(self.rect.x - offset[0]+self.slideoffset,self.rect.y - offset[1]))
+        screen.blit(pygame.transform.flip(self.__image,self.__flip,False),(self.__rect.x - offset[0]+self.__slide_offset,self.__rect.y - offset[1]))
 
     
     

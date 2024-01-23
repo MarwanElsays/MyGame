@@ -37,20 +37,20 @@ class Weapon:
         
     
     def isCollidingWithPlayer(self):
-        return self._player.rect.colliderect(self._rect)
+        return self._player.get_rect().colliderect(self._rect)
                     
     def checkEquipped(self):
       
-        if(self._player.getWepon() == self and not self._player.equipping):
-            self._player.setWepon(None)
+        if(self._player.get_wepon() == self and not self._player.get_equipping()):
+            self._player.set_wepon(None)
             self._equiped = False
             self._angle = 0
-            self._pos = [self._player.rect.center[0],self._player.rect.center[1]-30]
+            self._pos = [self._player.get_rect().center[0],self._player.get_rect().center[1]-30]
             
             print("unEquipped")
             
-        if(self._player.getWepon() == None and self.isCollidingWithPlayer() and self._player.equipping):
-            self._player.setWepon(self)
+        if(self._player.get_wepon() == None and self.isCollidingWithPlayer() and self._player.get_equipping()):
+            self._player.set_wepon(self)
             self._equiped = True
             self._angle = self._equipedAngle
                         
@@ -64,12 +64,12 @@ class Weapon:
         
         if self._equiped:
             self._floatAngle = 0
-            if self._player.flip:
+            if self._player.get_flip():
                 self._flip = True
-                self._pos = [self._player.rect.center[0]-10,self._player.rect.center[1]-10]
+                self._pos = [self._player.get_rect().center[0]-10,self._player.get_rect().center[1]-10]
             else:
                 self._flip = False
-                self._pos = [self._player.rect.center[0]-10,self._player.rect.center[1]-10]
+                self._pos = [self._player.get_rect().center[0]-10,self._player.get_rect().center[1]-10]
         else:
             self._floatAngle+=1
             self._floatAngle%=360

@@ -15,15 +15,13 @@ class MainMenuState(GameState):
 
         # Create a button with the custom theme
         button_rect = pygame.Rect((350, 275), (100, 50))
-        self.button = pygame_gui.elements.UIButton(relative_rect=button_rect,
-                                            text='New Game',
-                                            manager=self.ui_manager)
+        self.button = pygame_gui.elements.UIButton(relative_rect=button_rect,text='New Game',
+                                                   manager=self.ui_manager,visible=1)
+        
 
         button1_rect = pygame.Rect((150, 275), (100, 50))
-        self.button1 = pygame_gui.elements.UIButton(relative_rect=button1_rect,
-                                            text='hey me!',
-                                            manager=self.ui_manager)
-
+        self.button1 = pygame_gui.elements.UIButton(relative_rect=button1_rect,text='clear window!',
+                                                    manager=self.ui_manager)
 
         UIDropDownMenu1_rect = pygame.Rect((450, 275), (100, 50))
         self.uIDropDownMenu = pygame_gui.elements.UIDropDownMenu(['maro','youma'],'maro',UIDropDownMenu1_rect,manager=self.ui_manager)
@@ -40,14 +38,16 @@ class MainMenuState(GameState):
                 if event.ui_element == self.button:
                     self.gameStatesManager.getRunningState().intiallize()
                     self.gameStatesManager.setGameState(self.gameStatesManager.getRunningState())
-                    break
+                    break                   
                 if event.ui_element == self.button1:
-                    print("Nothing Happens")
-                        
+                    self.button.hide()
+                    #self.ui_manager.clear_and_reset()
+                    print("Window Cleared")
+                          
             # Pass events to the UIManager
             self.ui_manager.process_events(event)
             
-    
+                
         # Update the UIManager
         self.ui_manager.update(timeDelta)
         
@@ -55,8 +55,7 @@ class MainMenuState(GameState):
         self.screen.fill((255, 255, 255))
         self.ui_manager.draw_ui(self.screen)
         
-        print(timeDelta)
-        
+    
         
         
     

@@ -1,9 +1,10 @@
 import pygame
 from GameStates.gameState import GameState
 import sys
+from animation import Animation
 from enemy import Enemy
 from projectile import Explosion, ProjectileController
-from utils import load_image
+from utils import Spritesheet, load_image
 from player import Player
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH, SCREENSCALE
 from tileMap import tileMap
@@ -51,6 +52,11 @@ class RunningState(GameState):
         self.weapons = [rpg,rpg2]
                 
         self.tree  =  pygame.image.load('Assets/images/tiles/Trees/Tree1.png').convert_alpha()
+        
+            
+        self.character = Spritesheet('knight/KnightAttack.png','jsonImages/knight.json','#71664f')
+        self.knightAttack = self.character.get_sprite_images("knightAttack")
+        self.animation = Animation(self.knightAttack,4,'knightAttack')
                
             
     def run(self): 
@@ -58,8 +64,8 @@ class RunningState(GameState):
         self.display.fill(self.backGC)
         #self.display.blit(self.BackGroundImage, (0, 0)) 
                     
-        self.offset[0] += (self.player.rect.centerx - SCREEN_WIDTH/4 - self.offset[0])/15
-        self.offset[1] += (self.player.rect.centery - SCREEN_HEIGHT/4 - self.offset[1])/15
+        self.offset[0] += (self.player.get_rect().centerx - SCREEN_WIDTH/4 - self.offset[0])/15
+        self.offset[1] += (self.player.get_rect().centery - SCREEN_HEIGHT/4 - self.offset[1])/15
 
         renderOffset = (int(self.offset[0]),int(self.offset[1]))
                     
@@ -98,23 +104,25 @@ class RunningState(GameState):
         healthTextSurface = self.font.render("Health", False,  (0, 0, 0))
         self.display.blit(healthTextSurface, healthTextSurface.get_rect(topleft = (265,3))) 
         pygame.draw.rect(self.display, (255,255,200), pygame.Rect(295, 5, 100, 8)) 
-        pygame.draw.rect(self.display, (255,0,0), pygame.Rect(295, 5, self.player.health, 8))
+        pygame.draw.rect(self.display, (255,0,0), pygame.Rect(295, 5, self.player.get_health(), 8))
         
         
         # self.display.blit(self.tree,( 300 - renderOffset[0],400 - renderOffset[1]))
-                
+        self.knight_update() 
+        self.knight_render(self.display,renderOffset)     
         
         for events in pygame.event.get():
             if events.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit() 
             if events.type == pygame.MOUSEBUTTONDOWN:
+                self.gameStatesManager.getPauseState().intiallize()
                 self.gameStatesManager.setGameState(self.gameStatesManager.getPauseState())
             if events.type == pygame.KEYDOWN:
                 if(events.key == pygame.K_e):
-                    self.player.equipping = not self.player.equipping
+                    self.player.set_equipping(not self.player.get_equipping())
                 if(events.key == pygame.K_1):
-                    self.player.launchMissile()
+                    self.player.launch_missile()
         
                 
         self.screen.blit(pygame.transform.scale(self.display,(SCREENSCALE*self.screen.get_size()[0],SCREENSCALE*self.screen.get_size()[1])), (0, 0))
@@ -122,7 +130,15 @@ class RunningState(GameState):
         #pygame.display.update()
         #self.clock.tick(60)
         
+        
+    def knight_update(self):
+        self.animation.update()
+        self.image = self.animation.getImage()
+        self.rect = self.image.get_rect(center = (300, 200))
+    
+    def knight_render(self,display,renderOffset):
+       display.blit(self.image,(self.rect.x-renderOffset[0],self.rect.y-renderOffset[1]))  
+               
     def doAction(self,timeDelta):
-        print(timeDelta)
         self.run()
     
