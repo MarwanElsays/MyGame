@@ -14,8 +14,14 @@ class Animation:
         self.imageIdx += 1
         if(self.imageIdx == self.animationDuration):self.done = True
         self.imageIdx %= self.animationDuration
-        
-    def getImage(self)->pygame.Surface:
+    
+    def is_animation_done(self):
+        return self.done
+    
+    def get_anim_index(self):
+        return int(self.imageIdx / self.frameDuration)
+    
+    def getImage(self):
         img = self.images[int(self.imageIdx / self.frameDuration)]
         return img
     

@@ -27,10 +27,11 @@ def load_images(path,scale = (0,0),alpha = 0):
 
 class Spritesheet:
     
-    def __init__(self, image_path,jsonimage_path,color_key='#000000'):
+    def __init__(self, image_path,jsonimage_path,color_key='#000000',scale = (1,1)):
         self.image_path = BASE_IMG_PATH + image_path
         self.jsonimage_path = BASE_IMG_PATH + jsonimage_path
         self.color_key = color_key
+        self.scale = scale
         self.sprite_sheet = pygame.image.load(self.image_path).convert()
         with open(self.jsonimage_path) as f:
             self.data = json.load(f)
@@ -40,16 +41,16 @@ class Spritesheet:
         sprite = pygame.Surface((w, h))
         sprite.set_colorkey(self.color_key)
         sprite.blit(self.sprite_sheet,(0, 0),(x, y, w, h))
-        sprite = pygame.transform.scale(sprite,(w*9,h*9))   #change 3/SCALE if needed
+        sprite = pygame.transform.scale(sprite,(w*self.scale[0],h*self.scale[1]))
         return sprite
 
-    def get_sprite_images(self, animation_name):
+    def get_sprite_images(self, animation_name):  
         
         images = []
         sprite_frames = self.data[animation_name]
         for frame in sprite_frames.values():
-            x, y, w, h = frame["x"], frame["y"], frame["w"], frame["h"]
-            images.append(self.__get_sprite(x, y, w, h))
+            x, y, w, h, off = frame["x"], frame["y"], frame["w"], frame["h"], frame["off"]
+            images.append((self.__get_sprite(x, y, w, h),off))
             
         return images
 

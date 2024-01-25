@@ -9,6 +9,8 @@ class GameStatesManager:
         self.__mainMenuState = MainMenuState(self,screen)
         self.__runningState = RunningState(self,screen)
         self.__PauseState = PauseState(self,screen)
+        #self.__PauseState.intiallize()
+        #self.__gameState:GameState = self.__PauseState
         self.__gameState:GameState = self.__mainMenuState
         
     def setGameState(self,gameState):

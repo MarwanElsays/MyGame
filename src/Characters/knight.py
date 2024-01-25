@@ -1,10 +1,10 @@
 import pygame
 from animation import Animation
-from utils import load_images
+from utils import Spritesheet, load_images
 from settings import PSCALE, SCALE,GRAVITY
 from weapon import Weapon
 
-class Player():
+class Knight():
     def __init__(self,speedx,tile_map):
         self.__speedX ,self.__speedY = speedx, 0
         self.__tile_map = tile_map
@@ -23,25 +23,20 @@ class Player():
         
         #animation
         self.__flip = False    
-        self.__scale = (SCALE*16,SCALE*20)  
-        self.__animations = {"idle" : Animation(load_images('Player/idle',self.__scale),10,'idle'),
-                           "jump" : Animation(load_images('Player/jump',self.__scale),10,'jump'),
-                           "run" : Animation(load_images('Player/run',self.__scale),5,'run'),
-                           "slide" : Animation(load_images('Player/slide',self.__scale),10,'slide'),
-                           "wall_slide" : Animation(load_images('Player/wall_slide',self.__scale),10,'wall_slide')}
-        
+        self.__scale = (PSCALE,PSCALE) 
+        self.__knight_idle_sheet = Spritesheet('knight/knightIdle.png','jsonImages/knight.json','#71664f',self.__scale) 
+        self.__knight_attack_sheet = Spritesheet('knight/knightAttack.png','jsonImages/knight.json','#71664f',self.__scale) 
+        self.__animations = {
+            "idle" : Animation(self.__knight_idle_sheet.get_sprite_images("knightIdle"),6,'idle'),
+            "attack" : Animation(self.__knight_attack_sheet.get_sprite_images("knightAttack"),6,'attack')}
+
         self.__curr_animation =  self.__animations['idle']
         self.__image = self.__curr_animation.getImage()
-        self.__rect = self.__image.get_rect(topleft = (300, 200))
-        
-        #Slide
+        self.__rect = self.__image[0].get_rect(bottomleft = (300, 200))
+                    
+        #Wall sldie
         self.__WALLSLIDESPEED = 2
-        self.__slide = 0
-        self.__slide_time = 30
-        self.__slide_offset = 0
-        self.__can_slide = False
-        self.__slide_cnt = 0
-        
+                
         #climb
         self.__CLIMBSPEED = -4
         self.__can_climb = False
@@ -89,12 +84,7 @@ class Player():
             self.__can_climb = True
         else:
             self.__can_climb = False
-            
-        if(keys[pygame.K_x] and self.__dir[0] != 0 and self.__can_slide):
-            self.__slide = 1
-            self.__slide_cnt = 0
-            self.__can_slide = False
-        
+                    
         if(keys[pygame.K_SPACE] and self.__jumps > 0 and self.__can_jump): 
             self.__speedY = -6*PSCALE
             self.__collision[0] = 0
@@ -103,53 +93,53 @@ class Player():
             
         if(not keys[pygame.K_SPACE]):
             self.__can_jump = True
-            
-        if(not keys[pygame.K_x]):
-            self.__can_slide = True
-                               
+                                           
     def launch_missile(self):
         if (self.__wepon is not None):
-            self.__wepon.launch()    
+            self.__wepon.launch()   
+        
+    def anim_move(self,anim):
+        if anim == 'attack':
+            if(self.__curr_animation.get_anim_index() in [14,15,16]):
+                self.__rect.x += -1 if self.__flip else 1   
                                 
     def get_animation(self):
+             
         new_anim = ''
-        
+        print(self.__collision)
         if(not self.__collision[0]):
             if(any([self.__collision[2],self.__collision[3]])):
                 if(self.__can_climb):
-                    new_anim = 'idle'   # need to add climb animation
+                    new_anim = 'attack'   # need to add climb animation
                 else:
                     if(self.__speedY > 0):
-                        new_anim = 'wall_slide'
-                        self.__slide_offset = 3 * self.__dir[0]
+                        new_anim = 'attack'
                     else:
-                        new_anim = 'jump'
-                        self.__slide_offset = 0
+                        new_anim = 'attack'
             else:
-                new_anim = 'jump'
-                self.__slide_offset = 0
-                
-        elif(self.__slide):
-            new_anim = 'slide'
+                new_anim = 'attack'
         elif(self.__dir[0] == 0):
             new_anim = 'idle'
         else:
-            new_anim = 'run'
+            new_anim = 'attack'
             
         if(new_anim == self.__curr_animation.status):
             self.__curr_animation.update()
+            
+            new_img = self.__curr_animation.getImage()
+            new_rect = new_img[0].get_rect()
+
+            #self.anim_move(new_anim)
+            
+            if(self.__image != new_img):
+                self.__rect.y = self.__rect.y - (new_rect.h - self.__rect.h)
+                self.__rect.h = new_rect.h
         else:
             self.__curr_animation.imageIdx = 0
             self.__curr_animation = self.__animations[new_anim]
             
         self.__image = self.__curr_animation.getImage()
-        
-    def control_slide(self):
-        self.__slide_cnt+=1
-        if(self.__slide_cnt >= self.__slide_time):
-            self.__slide = 0
-            self.__slide_cnt = self.__slide_time 
-            
+                    
     def check_collisions(self, direction):
         if direction == "horizontal":
             for rect in self.__tile_map.getAroundTiles(self.__rect.center):
@@ -160,7 +150,6 @@ class Player():
                     if(self.__dir[0] == -1):
                         self.__collision[2] = 1
                         self.__rect.left = rect.right
-                    self.__slide = 0
         elif direction == "vertical":
             for rect in self.__tile_map.getAroundTiles(self.__rect.center):
                 if(self.__rect.colliderect(rect)):
@@ -171,8 +160,7 @@ class Player():
                         self.__collision[1] = 1
                         self.__rect.top = rect.bottom
                     self.__speedY = 1
-       
-                    
+                
     def handle_collision(self):
         if(self.__collision[1]):  #upWall bounce
             self.__speedY+=2
@@ -190,10 +178,9 @@ class Player():
         if(self.__collision[0]): 
             self.__jumps = self.__MAXJUMPS  
             self.__speedY,self.__can_climb = 1,False     #prevent player from climbing when on ground
-        else:
-            if(not self.__can_climb):
-                self.__speedY += self.__gravity
-                self.__speedY = min(9*PSCALE,self.__speedY)   
+        elif(not self.__can_climb):
+            self.__speedY += self.__gravity
+            self.__speedY = min(9*PSCALE,self.__speedY)   
                  
                                      
     def update(self):
@@ -201,19 +188,27 @@ class Player():
         self.__collision = [0,0,0,0]
         
         self.get_input()
-    
-        self.control_slide()
-        
-        self.__rect.x += self.__dir[0] * self.__speedX * (2 if self.__slide else 1)
+  
+        self.__rect.x += self.__dir[0] * self.__speedX
         self.check_collisions("horizontal")
                                       
         self.__rect.y += self.__speedY         
         self.check_collisions("vertical")
                                                            
         self.handle_collision()  
-                
+        
         self.get_animation() 
-               
-
+             
+                  
     def render(self,screen,offset):
-        screen.blit(pygame.transform.flip(self.__image,self.__flip,False),(self.__rect.x - offset[0]+self.__slide_offset,self.__rect.y - offset[1]))
+               
+        self.debug_rect(screen,offset)
+        
+        img_offset = (self.__image[1] if not self.__flip else -1*self.__image[1])
+        screen.blit(pygame.transform.flip(self.__image[0],self.__flip,False)
+                    ,(self.__rect.x - offset[0] - img_offset * PSCALE,self.__rect.y - offset[1]))
+        
+    def debug_rect(self,screen,offset):
+        pygame.draw.rect(screen, "#FF0000",pygame.Rect(self.__rect.x - offset[0] , 
+                                                       self.__rect.y - offset[1] , 
+                                                       self.__rect.w, self.__rect.h))

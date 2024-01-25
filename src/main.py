@@ -18,7 +18,7 @@ class Game:
         while True:
             time_delta = self.clock.tick(60) / 1000.0
             self.gameStatesManager.doAction(time_delta)
-            pygame.display.update() 
+            pygame.display.update()             
             
             
 if __name__ == "__main__":

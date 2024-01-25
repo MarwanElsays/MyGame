@@ -16,7 +16,7 @@ class Weapon:
         self._vY = 0   
         self._scale = scale
         
-        from player import Player
+        from Characters.player import Player
         self._player:Player = player
         
         self._image = load_image(f'wepons/{imageFilePath}',scale)

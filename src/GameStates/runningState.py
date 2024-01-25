@@ -1,11 +1,12 @@
 import pygame
+from Characters.knight import Knight
 from GameStates.gameState import GameState
 import sys
 from animation import Animation
 from enemy import Enemy
 from projectile import Explosion, ProjectileController
 from utils import Spritesheet, load_image
-from player import Player
+from Characters.player import Player
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH, SCREENSCALE
 from tileMap import tileMap
 from weapon import Weapon
@@ -31,7 +32,7 @@ class RunningState(GameState):
         self.map = tileMap("Assets/maps/map0.json")
         
         #Player
-        self.player = Player(5,self.map)
+        self.player = Knight(5,self.map)
         
         #Enemy
         self.enemy = {Enemy(1,0.3,(2547, 620),self.map) for i in range (300)}
