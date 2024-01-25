@@ -14,19 +14,15 @@ class MainMenuState(GameState):
                                                "C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/uiThemes/theme.json")
 
         # Create a button with the custom theme
-        button_rect = pygame.Rect((350, 275), (100, 50))
+        button_rect = pygame.Rect(((SCREEN_WIDTH-100)/2, (SCREEN_HEIGHT-120)/2), (100, 50))
         self.button = pygame_gui.elements.UIButton(relative_rect=button_rect,text='New Game',
                                                    manager=self.ui_manager,visible=1)
         
 
-        button1_rect = pygame.Rect((150, 275), (100, 50))
+        button1_rect = pygame.Rect(((SCREEN_WIDTH-100)/2, (SCREEN_HEIGHT-120)/2 + 70), (100, 50))
         self.button1 = pygame_gui.elements.UIButton(relative_rect=button1_rect,text='clear window!',
                                                     manager=self.ui_manager)
-
-        UIDropDownMenu1_rect = pygame.Rect((450, 275), (100, 50))
-        self.uIDropDownMenu = pygame_gui.elements.UIDropDownMenu(['maro','youma'],'maro',UIDropDownMenu1_rect,manager=self.ui_manager)
-           
-           
+               
     def doAction(self,timeDelta):
         
         

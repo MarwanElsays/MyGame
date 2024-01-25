@@ -8,11 +8,11 @@ from utils import load_image, load_images
 
 class Projectile():
     
-    def __init__(self,mass,imageFilePath,scale,angle,flip,intialPos = [0 , 300]):
+    def __init__(self,mass,image_file_path,scale,angle,flip,intial_pos = [0 , 300]):
         
         #image
-        self.image = load_image(f'wepons/{imageFilePath}',scale)
-        self.rect = self.image.get_rect(topleft = (intialPos[0],intialPos[1]))
+        self.image = load_image(f'wepons/{image_file_path}',scale)
+        self.rect = self.image.get_rect(topleft = (intial_pos[0],intial_pos[1]))
         self.rect.width = max(scale[0],scale[1]) - 7    #Adjust rect to be in middle
         self.rect.height = max(scale[0],scale[1]) - 7   #Adjust rect to be in middle
         
@@ -21,7 +21,7 @@ class Projectile():
         self.delta_t = 0.03
         self.mass = mass
         self.force = [0 , self.mass * GRAVITY]
-        self.pos = intialPos
+        self.pos = intial_pos
         
         self.angle = angle
         self.theta = math.radians(self.angle)
@@ -121,9 +121,9 @@ class ProjectileController():
 
 class Explosion:
     
-    def __init__(self,folderPath,pos):
+    def __init__(self,folder_path,pos):
         
-        self.images = load_images(folderPath,(20,20))
+        self.images = load_images(folder_path,(20,20))
         self.animation = Animation(self.images,6)
         self.pos = pos
         

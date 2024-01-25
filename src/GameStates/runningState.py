@@ -31,7 +31,7 @@ class RunningState(GameState):
         self.map = tileMap("Assets/maps/map0.json")
         
         #Player
-        self.player = Player(5,0.3,self.map)
+        self.player = Player(5,self.map)
         
         #Enemy
         self.enemy = {Enemy(1,0.3,(2547, 620),self.map) for i in range (300)}
@@ -52,12 +52,7 @@ class RunningState(GameState):
         self.weapons = [rpg,rpg2]
                 
         self.tree  =  pygame.image.load('Assets/images/tiles/Trees/Tree1.png').convert_alpha()
-        
-            
-        self.character = Spritesheet('knight/KnightAttack.png','jsonImages/knight.json','#71664f')
-        self.knightAttack = self.character.get_sprite_images("knightAttack")
-        self.animation = Animation(self.knightAttack,4,'knightAttack')
-               
+                      
             
     def run(self): 
         
@@ -107,9 +102,7 @@ class RunningState(GameState):
         pygame.draw.rect(self.display, (255,0,0), pygame.Rect(295, 5, self.player.get_health(), 8))
         
         
-        # self.display.blit(self.tree,( 300 - renderOffset[0],400 - renderOffset[1]))
-        self.knight_update() 
-        self.knight_render(self.display,renderOffset)     
+        # self.display.blit(self.tree,( 300 - renderOffset[0],400 - renderOffset[1]))   
         
         for events in pygame.event.get():
             if events.type == pygame.QUIT:
@@ -130,15 +123,6 @@ class RunningState(GameState):
         #pygame.display.update()
         #self.clock.tick(60)
         
-        
-    def knight_update(self):
-        self.animation.update()
-        self.image = self.animation.getImage()
-        self.rect = self.image.get_rect(center = (300, 200))
-    
-    def knight_render(self,display,renderOffset):
-       display.blit(self.image,(self.rect.x-renderOffset[0],self.rect.y-renderOffset[1]))  
-               
     def doAction(self,timeDelta):
         self.run()
     

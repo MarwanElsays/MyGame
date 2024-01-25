@@ -1,23 +1,24 @@
 import pygame
 from animation import Animation
 from utils import load_images
-from settings import SCALE
+from settings import PSCALE, SCALE,GRAVITY
 from weapon import Weapon
 
 class Player():
-    def __init__(self,speedx,gravity,tile_map):
+    def __init__(self,speedx,tile_map):
         self.__speedX ,self.__speedY = speedx, 0
         self.__tile_map = tile_map
-        self.__gravity = gravity
+        self.__gravity = GRAVITY
         self.__dir = [0,0]
         self.__collision = [0,0,0,0]  #down,top,left,right
         
         #health
-        MAXHEALTH = 100
-        self.__health = MAXHEALTH/2
+        self.__MAXHEALTH = 100
+        self.__health = self.__MAXHEALTH/2
         
         #Jumps
-        self.__jumps = 2
+        self.__MAXJUMPS = 2
+        self.__jumps = self.__MAXJUMPS
         self.__can_jump = True
         
         #animation
@@ -31,9 +32,10 @@ class Player():
         
         self.__curr_animation =  self.__animations['idle']
         self.__image = self.__curr_animation.getImage()
-        self.__rect = self.__image.get_rect(center = (300, 200))
+        self.__rect = self.__image.get_rect(topleft = (300, 200))
         
         #Slide
+        self.__WALLSLIDESPEED = 2
         self.__slide = 0
         self.__slide_time = 30
         self.__slide_offset = 0
@@ -41,11 +43,16 @@ class Player():
         self.__slide_cnt = 0
         
         #climb
+        self.__CLIMBSPEED = -4
         self.__can_climb = False
         
         #Wepon
         self.__wepon:Weapon= None
         self.__equipping = False
+    
+    
+    def get_wepon(self)->Weapon:
+        return self.__wepon
     
     def get_health(self):
         return self.__health
@@ -56,17 +63,15 @@ class Player():
     def get_rect(self):
         return self.__rect
     
-    def set_equipping(self,equipping):
-        self.__equipping = equipping
-      
     def get_equipping(self):
         return self.__equipping
     
+    def set_equipping(self,equipping):
+        self.__equipping = equipping
+
     def set_wepon(self,wepon):
         self.__wepon = wepon
         
-    def get_wepon(self)->Weapon:
-        return self.__wepon
             
     def get_input(self):
         
@@ -76,8 +81,7 @@ class Player():
             self.__flip = False
         elif(keys[pygame.K_LEFT]): 
             self.__dir[0] = -1
-            self.__flip = True
-            
+            self.__flip = True 
         else:
             self.__dir[0] = 0
             
@@ -92,7 +96,7 @@ class Player():
             self.__can_slide = False
         
         if(keys[pygame.K_SPACE] and self.__jumps > 0 and self.__can_jump): 
-            self.__speedY = -6*SCALE
+            self.__speedY = -6*PSCALE
             self.__collision[0] = 0
             self.__jumps-=1
             self.__can_jump = False
@@ -111,7 +115,7 @@ class Player():
         new_anim = ''
         
         if(not self.__collision[0]):
-            if((self.__collision[2] or self.__collision[3])):
+            if(any([self.__collision[2],self.__collision[3]])):
                 if(self.__can_climb):
                     new_anim = 'idle'   # need to add climb animation
                 else:
@@ -145,71 +149,71 @@ class Player():
         if(self.__slide_cnt >= self.__slide_time):
             self.__slide = 0
             self.__slide_cnt = self.__slide_time 
+            
+    def check_collisions(self, direction):
+        if direction == "horizontal":
+            for rect in self.__tile_map.getAroundTiles(self.__rect.center):
+                if(self.__rect.colliderect(rect)):
+                    if(self.__dir[0] == 1):
+                        self.__collision[3] = 1
+                        self.__rect.right = rect.left
+                    if(self.__dir[0] == -1):
+                        self.__collision[2] = 1
+                        self.__rect.left = rect.right
+                    self.__slide = 0
+        elif direction == "vertical":
+            for rect in self.__tile_map.getAroundTiles(self.__rect.center):
+                if(self.__rect.colliderect(rect)):
+                    if(self.__speedY >= 0):
+                        self.__collision[0] = 1
+                        self.__rect.bottom = rect.top
+                    if(self.__speedY < 0):
+                        self.__collision[1] = 1
+                        self.__rect.top = rect.bottom
+                    self.__speedY = 1
+       
+                    
+    def handle_collision(self):
+        if(self.__collision[1]):  #upWall bounce
+            self.__speedY+=2
+        
+        if(self.__collision[2] or self.__collision[3]):
+            if(self.__speedY > 0):                           #handle wall slide      
+                self.__speedY = self.__WALLSLIDESPEED        #he can jump of wall when sliding
+        
+            if self.__can_climb : 
+                self.__speedY = self.__CLIMBSPEED        
+                self.__jumps = 0         #prevent player from jumping when climbing 
+        else:
+            self.__can_climb = False     #if player is not on left or right Wall then he cant climb
+                   
+        if(self.__collision[0]): 
+            self.__jumps = self.__MAXJUMPS  
+            self.__speedY,self.__can_climb = 1,False     #prevent player from climbing when on ground
+        else:
+            if(not self.__can_climb):
+                self.__speedY += self.__gravity
+                self.__speedY = min(9*PSCALE,self.__speedY)   
                  
+                                     
     def update(self):
+        prev_col = self.__collision
         self.__collision = [0,0,0,0]
         
         self.get_input()
     
         self.control_slide()
-        if(self.__slide):
-            self.__rect.x += self.__dir[0] * self.__speedX * 2 
-        else:
-            self.__rect.x += self.__dir[0] * self.__speedX 
-             
-        for rect in self.__tile_map.getAroundTiles(self.__rect.center):
-            if(self.__rect.colliderect(rect)):
-                if(self.__dir[0] == 1):
-                    self.__collision[3] = 1
-                    self.__rect.right = rect.left
-                if(self.__dir[0] == -1):
-                    self.__collision[2] = 1
-                    self.__rect.left = rect.right
-                self.__slide = 0
+        
+        self.__rect.x += self.__dir[0] * self.__speedX * (2 if self.__slide else 1)
+        self.check_collisions("horizontal")
                                       
         self.__rect.y += self.__speedY         
-        colRect = pygame.rect.Rect(self.__rect)
-        if(self.__speedY < 0.5 and self.__speedY >= 0): colRect.y+=1
-    
-        for rect in self.__tile_map.getAroundTiles(self.__rect.center):
-            if(colRect.colliderect(rect)):
-                if(self.__speedY >= 0):
-                    self.__collision[0] = 1
-                    colRect.bottom = rect.top
-                if(self.__speedY < 0):
-                    self.__collision[1] = 1
-                    colRect.top = rect.bottom
-                self.__rect = colRect
-                self.__speedY = 0                     
-                          
-                          
-        if(self.__collision[1]):  #upWall bounce
-            self.__speedY+=2
-        
-        if((self.__collision[2] or self.__collision[3]) and self.__speedY > 0): #wallSlide
-            if(self.__can_climb):
-                self.__speedY = -3
-            else:
-                self.__speedY = 1
-
-        #if player is not on left or right Wall then he cant climb
-        if(not(self.__collision[2] or self.__collision[3])): 
-            self.__can_climb = False
-                    
-        if(self.__collision[0]): 
-            self.__jumps = 2   
-            self.__can_climb = False     #prevent player from climbing when on ground
-        else:
-            if(not self.__can_climb):
-                self.__speedY += self.__gravity
-                self.__speedY = min(9*SCALE,self.__speedY)  
-               
+        self.check_collisions("vertical")
+                                                           
+        self.handle_collision()  
+                
         self.get_animation() 
-        
+               
 
     def render(self,screen,offset):
         screen.blit(pygame.transform.flip(self.__image,self.__flip,False),(self.__rect.x - offset[0]+self.__slide_offset,self.__rect.y - offset[1]))
-
-    
-    
-    
