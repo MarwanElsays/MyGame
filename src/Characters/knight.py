@@ -180,8 +180,7 @@ class Knight():
             self.__speedY,self.__can_climb = 1,False     #prevent player from climbing when on ground
         elif(not self.__can_climb):
             self.__speedY += self.__gravity
-            self.__speedY = min(9*PSCALE,self.__speedY)   
-                 
+            self.__speedY = min(9*PSCALE,self.__speedY)    
                                      
     def update(self):
         prev_col = self.__collision
@@ -202,12 +201,16 @@ class Knight():
                   
     def render(self,screen,offset):
                
-        self.debug_rect(screen,offset)
-        
-        img_offset = (self.__image[1] if not self.__flip else -1*self.__image[1])
+        #self.debug_rect(screen,offset)
+        img_offset = 0
+        if self.__flip:
+            img_offset = -(self.__image[0].get_rect().w - 35) + self.__image[1] * PSCALE
+        else:   
+            img_offset = -self.__image[1] * PSCALE
+            
         screen.blit(pygame.transform.flip(self.__image[0],self.__flip,False)
-                    ,(self.__rect.x - offset[0] - img_offset * PSCALE,self.__rect.y - offset[1]))
-        
+                    ,(self.__rect.x - offset[0] + img_offset,self.__rect.y - offset[1]))
+                
     def debug_rect(self,screen,offset):
         pygame.draw.rect(screen, "#FF0000",pygame.Rect(self.__rect.x - offset[0] , 
                                                        self.__rect.y - offset[1] , 

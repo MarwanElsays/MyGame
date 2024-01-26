@@ -49,8 +49,8 @@ class Spritesheet:
         images = []
         sprite_frames = self.data[animation_name]
         for frame in sprite_frames.values():
-            x, y, w, h, off = frame["x"], frame["y"], frame["w"], frame["h"], frame["off"]
-            images.append((self.__get_sprite(x, y, w, h),off))
+            x, y, w, h, off ,flip_off= frame["x"], frame["y"], frame["w"], frame["h"], frame["off"],frame["flipOff"]
+            images.append((self.__get_sprite(x, y, w, h),off,flip_off))
             
         return images
 

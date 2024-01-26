@@ -10,38 +10,36 @@ class PauseState(GameState):
         super().__init__(gameStatesManager,screen)
        
     def intiallize(self):
-        # self.character = Spritesheet('knight/KnightAttack.png','jsonImages/knight.json','#71664f')
-        # self.knightAttack = self.character.get_sprite_images("knightAttack")
-        # self.animation = Animation(self.knightAttack,4,'knightAttack')
+       
         self.bk_image = load_image_alpha('menu/pinkBorder1.png',(400,500))
         
-        self.x ,self.y = 20,0    
-        self.character = Spritesheet('knight/knightIdle.png','jsonImages/knight.json','#71664f')
-        self.knightAttack = self.character.get_sprite_images("knightIdle")
-        #self.knightIdle = self.character.get_sprite_images("knightIdle")
+        self.x ,self.y = 20,0  
+        self.scale = (3,3)  
+        self.knight_idle_sheet = Spritesheet('knight/knightIdle.png','jsonImages/knight.json','#71664f',self.scale) 
+        self.knight_attack_sheet = Spritesheet('knight/knightAttack.png','jsonImages/knight.json','#71664f',self.scale) 
+        self.animations = {
+            "idle" : Animation(self.knight_idle_sheet.get_sprite_images("knightIdle"),6,'idle'),
+            "attack" : Animation(self.knight_attack_sheet.get_sprite_images("knightAttack"),6,'attack')
+        }
         
-        self.animation = Animation(self.knightAttack,6,'knightAttack')
-        self.pos = [(self.x,self.y+i*100) for i in range (len(self.knightAttack))]
-        self.rect = self.knightAttack[0][0].get_rect(bottomleft = (610, 330))
+        # self.pos = [(self.x,self.y+i*100) for i in range (len(self.knightAttack))]
+        self.curr_animation =  self.animations['idle']
+        self.image = self.curr_animation.getImage()
+        self.rect = self.image[0].get_rect(bottomleft = (610, 330))
 
-        self.image = self.knightAttack[0][0]
-        print(self.rect)
         self.offset = 0
         self.offsetx = 0
+        self.flip = True
+        
     def doAction(self,timeDelta):
         self.screen.fill("#FFFFFF")
 
-       
         for events in pygame.event.get():
             if events.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()    
-            if events.type == pygame.MOUSEBUTTONDOWN:
-                 
-                if events.button == 4:  # Scroll Up
-                    self.offset -=20
-                elif events.button == 5:  # Scroll Down
-                    self.offset +=20
+            if events.type == pygame.MOUSEBUTTONDOWN: 
+                self.flip = not self.flip
                     
             if events.type == pygame.KEYDOWN:
                  
@@ -59,9 +57,9 @@ class PauseState(GameState):
         
         
     def update(self):
-        self.animation.update()
+        self.curr_animation.update()
         
-        new_img = self.animation.getImage()
+        new_img = self.curr_animation.getImage()
         new_rect = new_img[0].get_rect()
         
         # if(self.animation.get_anim_index() in [14,15,16]):
@@ -74,12 +72,20 @@ class PauseState(GameState):
                    
     def render(self):
         #self.screen.blit(self.bk_image,(400,100))
-        print(self.image[1])
-        self.screen.blit(self.image[0],(self.rect.x+self.offsetx-self.image[1]*3,self.rect.y))  
+        
+        img_offset = 0
+        if self.flip:
+            img_offset = -(self.image[0].get_rect().w - 35) + self.image[1] * self.scale[0]
+        else:   
+            img_offset = -self.image[1] * self.scale[0]
+            
+        self.screen.blit(pygame.transform.flip(self.image[0],self.flip,False)
+                    ,(self.rect.x -  self.offsetx + img_offset,self.rect.y )) 
 
         pygame.draw.line(self.screen,"#FF0000",(0,self.rect.y + self.rect.h),(1200,self.rect.y + self.rect.h))
-        #pygame.draw.line(self.screen,"#FF0000",(self.rect.x,0),(self.rect.x,1000))
-        for i,img in enumerate(self.knightAttack):   
-            self.screen.blit(img[0],(self.pos[i][0],self.pos[i][1]-self.offset))  
+        pygame.draw.line(self.screen,"#FF0000",(self.rect.x,0),(self.rect.x,1000))
+        
+        # for i,img in enumerate(self.knightAttack):   
+        #     self.screen.blit(img[0],(self.pos[i][0],self.pos[i][1]-self.offset))  
         
         
