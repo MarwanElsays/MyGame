@@ -18,20 +18,23 @@ class Game:
         
         self.offset = [0,0]
         
+        self.background = False
         self.Tiles = {
             "rockyGround" : load_images('tiles/rockyGround'),
             "Grass" : load_images('tiles/Grass'),
             "Alien" : load_images('tiles/Alien',(TILE_SIZE,TILE_SIZE)),
             "Chests": load_images('/chests',(TILE_SIZE,TILE_SIZE)),
+            "Lava": load_images('tiles/Lava',(TILE_SIZE,TILE_SIZE)),
         }
          
         self.TilesAsList = list(self.Tiles)
+        print(self.TilesAsList)
         print(len(self.Tiles))
         self.tileType = 0 
         self.variant = 0       
         self.speed = [0,0]
         self.pos = [self.width/2,self.height/2]
-        self.TilesDrawn = self.LoadMap('Assets/maps/map0.json')
+        self.TilesDrawn , self.backgroundTiles = self.LoadMap('Assets/maps/map0.json')
             
     def getpos(self,pos):
         newPos = (int(pos[0]/TILE_SIZE),int(pos[1]/TILE_SIZE))
@@ -39,14 +42,14 @@ class Game:
     
     def save(self, path):
         f = open(path, 'w')
-        json.dump({'tilemap': self.TilesDrawn}, f)
+        json.dump({'tilemap': self.TilesDrawn,'backgroundTiles':self.backgroundTiles}, f)
         f.close()
         
     def LoadMap(self,path):
         f = open(path, 'r')
         map_data = json.load(f)
         f.close()
-        return map_data['tilemap']
+        return map_data['tilemap'], map_data['backgroundTiles'] if 'backgroundTiles' in map_data else {}
     
     def render(self,offset):
         # for tilesInfo in self.TilesDrawn.values():
@@ -59,7 +62,9 @@ class Game:
                 if loc in self.TilesDrawn:
                     type,var,pos = self.TilesDrawn[loc].values()
                     self.screen.blit(self.Tiles[type][var], (pos[0] * TILE_SIZE - offset[0],pos[1] * TILE_SIZE - offset[1]))
-        
+                if loc in self.backgroundTiles:
+                    type,var,pos = self.backgroundTiles[loc].values()
+                    self.screen.blit(self.Tiles[type][var], (pos[0] * TILE_SIZE - offset[0],pos[1] * TILE_SIZE - offset[1]))        
       
     def getInput(self,renderOffset):
         mousePos = pygame.mouse.get_pos()
@@ -68,15 +73,22 @@ class Game:
         tilekey = str(newpos[0]) + ';' + str(newpos[1])
         
         if(Mouse[0]):
-            self.TilesDrawn[tilekey] = {'type':self.TilesAsList[self.tileType],'variant':self.variant,'pos':newpos}
+            if(not self.background):
+                self.TilesDrawn[tilekey] = {'type':self.TilesAsList[self.tileType],'variant':self.variant,'pos':newpos}
+            else:
+                self.backgroundTiles[tilekey] = {'type':self.TilesAsList[self.tileType],'variant':self.variant,'pos':newpos}
+            
             print(tilekey)   
             print((mousePos[0] + renderOffset[0],mousePos[1] + renderOffset[1]))
             
         elif(Mouse[2]):
-            if(tilekey in self.TilesDrawn):
-                self.TilesDrawn.pop(tilekey)
+            if(not self.background):
+                if(tilekey in self.TilesDrawn):
+                    self.TilesDrawn.pop(tilekey)
+            else:
+                if(tilekey in self.backgroundTiles):
+                    self.backgroundTiles.pop(tilekey)
             
-        
         
     def run(self): 
         
@@ -113,6 +125,8 @@ class Game:
                         self.speed[1] = -10
                     if events.key == pygame.K_DOWN:
                         self.speed[1] = 10
+                    if events.key == pygame.K_b:
+                        self.background = not self.background
                     if events.key == pygame.K_v:
                         self.variant+=1
                         self.variant%=len(self.Tiles[self.TilesAsList[self.tileType]])
