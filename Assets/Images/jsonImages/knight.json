@@ -39,6 +39,16 @@
         "frame_13":{"x":1191,"y":14,"w":23,"h":30,"off":0,"flipOff":0},
         "frame_14":{"x":1287,"y":14,"w":24,"h":30,"off":0,"flipOff":0},
         "frame_15":{"x":1383,"y":14,"w":24,"h":30,"off":0,"flipOff":0}
+    },
+    "knightRun":{
+        "frame_1":{"x":42,"y":15,"w":25,"h":29,"off":0,"flipOff":8},
+        "frame_2":{"x":140,"y":14,"w":25,"h":30,"off":0,"flipOff":11},
+        "frame_3":{"x":236,"y":15,"w":27,"h":29,"off":0,"flipOff":13},
+        "frame_4":{"x":330,"y":16,"w":30,"h":28,"off":0,"flipOff":14},
+        "frame_5":{"x":426,"y":15,"w":29,"h":29,"off":0,"flipOff":13},
+        "frame_6":{"x":524,"y":14,"w":25,"h":30,"off":0,"flipOff":11},
+        "frame_7":{"x":618,"y":15,"w":25,"h":29,"off":0,"flipOff":9},
+        "frame_8":{"x":713,"y":16,"w":25,"h":28,"off":0,"flipOff":7}
     }
     
 }

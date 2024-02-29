@@ -53,6 +53,14 @@ class Spritesheet:
             images.append((self.__get_sprite(x, y, w, h),off,flip_off))
             
         return images
+    
+    def get_first_image(self, animation_name):
+
+        sprite_frames = self.data[animation_name]
+        frame = sprite_frames["frame_1"]
+        x, y, w, h = frame["x"], frame["y"], frame["w"], frame["h"]
+                
+        return self.__get_sprite(x, y, w, h)
 
 
 

@@ -16,9 +16,9 @@ class RunningState(GameState):
     def __init__(self, gameStatesManager, screen) -> None:
         super().__init__(gameStatesManager,screen)
            
-    def intiallize(self):
+    def intiallize(self,character = "player"):
         
-        self.backGC = '#000999'
+        self.backGC = '#00FFBB'
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.BackGroundImage = load_image('background.png')
                 
@@ -32,8 +32,11 @@ class RunningState(GameState):
         self.map = tileMap("Assets/maps/map0.json")
         
         #Player
-        self.player = Knight(5,self.map)
-        
+        if character == "player":
+            self.player = Player(6,self.map)
+        elif character == "Knight":
+            self.player = Knight(6,self.map)
+            
         #Enemy
         self.enemy = {Enemy(1,0.3,(2547, 620),self.map) for i in range (300)}
       
@@ -55,13 +58,14 @@ class RunningState(GameState):
         self.tree  =  pygame.image.load('Assets/images/tiles/Trees/Tree1.png').convert_alpha()
                       
             
-    def run(self): 
-        
+    def run(self,timeDelta): 
+
         self.display.fill(self.backGC)
         #self.display.blit(self.BackGroundImage, (0, 0)) 
-                    
+        # print(abs(self.player.get_rect().centery - SCREEN_HEIGHT/4 - self.offset[1]))         
         self.offset[0] += (self.player.get_rect().centerx - SCREEN_WIDTH/4 - self.offset[0])/15
-        self.offset[1] += (self.player.get_rect().centery - SCREEN_HEIGHT/4 - self.offset[1])/15
+        if(abs(self.player.get_rect().centery - SCREEN_HEIGHT/4 - self.offset[1]) > 4):
+            self.offset[1] += (self.player.get_rect().centery - SCREEN_HEIGHT/4 - self.offset[1])/15
 
         renderOffset = (int(self.offset[0]),int(self.offset[1]))
                     
@@ -125,5 +129,5 @@ class RunningState(GameState):
         #self.clock.tick(60)
         
     def doAction(self,timeDelta):
-        self.run()
+        self.run(timeDelta)
     

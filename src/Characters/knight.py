@@ -26,9 +26,11 @@ class Knight():
         self.__scale = (PSCALE,PSCALE) 
         self.__knight_idle_sheet = Spritesheet('knight/knightIdle.png','jsonImages/knight.json','#71664f',self.__scale) 
         self.__knight_attack_sheet = Spritesheet('knight/knightAttack.png','jsonImages/knight.json','#71664f',self.__scale) 
+        self.__knight_run_sheet = Spritesheet('knight/knightRun.png','jsonImages/knight.json','#71664f',self.__scale) 
         self.__animations = {
             "idle" : Animation(self.__knight_idle_sheet.get_sprite_images("knightIdle"),6,'idle'),
-            "attack" : Animation(self.__knight_attack_sheet.get_sprite_images("knightAttack"),6,'attack')}
+            "attack" : Animation(self.__knight_attack_sheet.get_sprite_images("knightAttack"),6,'attack'),
+            "run": Animation(self.__knight_run_sheet.get_sprite_images("knightRun"),4,'run')}
 
         self.__curr_animation =  self.__animations['idle']
         self.__image = self.__curr_animation.getImage()
@@ -44,6 +46,10 @@ class Knight():
         #Wepon
         self.__wepon:Weapon= None
         self.__equipping = False
+        
+        self.col = self.__rect
+        
+        self.colcnt = 0
     
     
     def get_wepon(self)->Weapon:
@@ -106,22 +112,21 @@ class Knight():
     def get_animation(self):
              
         new_anim = ''
-        print(self.__collision)
         if(not self.__collision[0]):
             if(any([self.__collision[2],self.__collision[3]])):
                 if(self.__can_climb):
-                    new_anim = 'attack'   # need to add climb animation
+                    new_anim = 'idle'   # need to add climb animation
                 else:
                     if(self.__speedY > 0):
-                        new_anim = 'attack'
+                        new_anim = 'idle'
                     else:
-                        new_anim = 'attack'
+                        new_anim = 'idle'
             else:
-                new_anim = 'attack'
+                new_anim = 'idle'
         elif(self.__dir[0] == 0):
             new_anim = 'idle'
         else:
-            new_anim = 'attack'
+            new_anim = 'run'
             
         if(new_anim == self.__curr_animation.status):
             self.__curr_animation.update()
@@ -130,17 +135,21 @@ class Knight():
             new_rect = new_img[0].get_rect()
 
             #self.anim_move(new_anim)
-            
             if(self.__image != new_img):
                 self.__rect.y = self.__rect.y - (new_rect.h - self.__rect.h)
                 self.__rect.h = new_rect.h
         else:
             self.__curr_animation.imageIdx = 0
             self.__curr_animation = self.__animations[new_anim]
-            
-        self.__image = self.__curr_animation.getImage()
                     
+        self.__image = self.__curr_animation.getImage()
+        if(new_anim == 'run'):
+            self.__rect.w = 26
+        else:
+            self.__rect.w = 36
+                            
     def check_collisions(self, direction):
+        
         if direction == "horizontal":
             for rect in self.__tile_map.getAroundTiles(self.__rect.center):
                 if(self.__rect.colliderect(rect)):
@@ -150,13 +159,19 @@ class Knight():
                     if(self.__dir[0] == -1):
                         self.__collision[2] = 1
                         self.__rect.left = rect.right
+                    #self.col = rect
+
         elif direction == "vertical":
             for rect in self.__tile_map.getAroundTiles(self.__rect.center):
                 if(self.__rect.colliderect(rect)):
+                    self.colcnt+=1
                     if(self.__speedY >= 0):
+                        # print("tile   ",rect)
+                        # print("my_rect",self.__rect)
                         self.__collision[0] = 1
                         self.__rect.bottom = rect.top
                     if(self.__speedY < 0):
+                        #print(self.__speedY)
                         self.__collision[1] = 1
                         self.__rect.top = rect.bottom
                     self.__speedY = 1
@@ -190,21 +205,28 @@ class Knight():
   
         self.__rect.x += self.__dir[0] * self.__speedX
         self.check_collisions("horizontal")
-                                      
+                                
         self.__rect.y += self.__speedY         
         self.check_collisions("vertical")
                                                            
         self.handle_collision()  
         
-        self.get_animation() 
-             
+        self.get_animation()  
+        self.check_collisions("vertical")  
+        #self.handle_collision()
+                                      
                   
     def render(self,screen,offset):
                
         #self.debug_rect(screen,offset)
+        # print("my rect: ",self.__rect)
+        # print("img_rect: ",self.__image[0].get_rect())
+        #self.col_rect(screen,offset)
         img_offset = 0
         if self.__flip:
             img_offset = -(self.__image[0].get_rect().w - 35) + self.__image[1] * PSCALE
+            if self.__curr_animation.status == 'run':
+                img_offset-=self.__image[2]
         else:   
             img_offset = -self.__image[1] * PSCALE
             
@@ -215,3 +237,8 @@ class Knight():
         pygame.draw.rect(screen, "#FF0000",pygame.Rect(self.__rect.x - offset[0] , 
                                                        self.__rect.y - offset[1] , 
                                                        self.__rect.w, self.__rect.h))
+        
+    def col_rect(self,screen,offset):
+        pygame.draw.rect(screen, "#00FF00",pygame.Rect(self.col.x - offset[0] , 
+                                                       self.col.y - offset[1] , 
+                                                       self.col.w, self.col.h))
