@@ -14,6 +14,9 @@ class MainMenuState(GameState):
         self.soundfile = "Assets/Sounds/buttonSelection.mp3" 
         self.soundeffect = pygame.mixer.Sound(self.soundfile) 
         
+        #fonts
+        self.font = pygame.font.Font('Assets/fonts/Evil_Empire.otf',9)
+        
         self.curr_screen = 1
         self.scale = (3,3)
         
@@ -127,6 +130,9 @@ class MainMenuState(GameState):
         img_pos = ((SCREEN_WIDTH)/2,(SCREEN_HEIGHT)/2)
         character_type = self.characters_list[self.curr_character]
         self.screen.blit(self.characters[character_type],img_pos)
+        
+        char_text_surface = self.font.render("Select a Character", False,  (0, 0, 0))
+        self.screen.blit(pygame.transform.scale(char_text_surface,(300,20)), char_text_surface.get_rect(topleft = ((SCREEN_WIDTH)/2 - 100,100))) 
           
            
     def doAction(self,timeDelta):

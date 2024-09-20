@@ -159,7 +159,7 @@ class Knight():
                     if(self.__dir[0] == -1):
                         self.__collision[2] = 1
                         self.__rect.left = rect.right
-                    #self.col = rect
+                    self.col = rect
 
         elif direction == "vertical":
             for rect in self.__tile_map.getAroundTiles(self.__rect.center):
@@ -232,6 +232,8 @@ class Knight():
             
         screen.blit(pygame.transform.flip(self.__image[0],self.__flip,False)
                     ,(self.__rect.x - offset[0] + img_offset,self.__rect.y - offset[1]))
+                
+                
                 
     def debug_rect(self,screen,offset):
         pygame.draw.rect(screen, "#FF0000",pygame.Rect(self.__rect.x - offset[0] , 
