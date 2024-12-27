@@ -116,12 +116,7 @@ class RunningState(GameState):
             if events.type == pygame.MOUSEBUTTONDOWN:
                 self.gameStatesManager.getPauseState().intiallize()
                 self.gameStatesManager.setGameState(self.gameStatesManager.getPauseState())
-            if events.type == pygame.KEYDOWN:
-                if(events.key == pygame.K_e):
-                    self.player.set_equipping(not self.player.get_equipping())
-                if(events.key == pygame.K_1):
-                    self.player.launch_missile()
-        
+                        
                 
         self.screen.blit(pygame.transform.scale(self.display,(SCREENSCALE*self.screen.get_size()[0],SCREENSCALE*self.screen.get_size()[1])), (0, 0))
             
