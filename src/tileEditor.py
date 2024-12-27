@@ -22,6 +22,7 @@ class Game:
         self.Tiles = {
             "rockyGround" : load_images('tiles/rockyGround'),
             "Grass" : load_images('tiles/Grass'),
+            "Grass2" : load_images('tiles/Grass2'),
             "Alien" : load_images('tiles/Alien',(TILE_SIZE,TILE_SIZE)),
             "Chests": load_images('/chests',(TILE_SIZE,TILE_SIZE)),
             "Lava": load_images('tiles/Lava',(TILE_SIZE,TILE_SIZE)),
@@ -35,6 +36,7 @@ class Game:
         self.speed = [0,0]
         self.pos = [self.width/2,self.height/2]
         self.TilesDrawn , self.backgroundTiles = self.LoadMap('Assets/maps/map0.json')
+        print(self.backgroundTiles)
             
     def getpos(self,pos):
         newPos = (int(pos[0]/TILE_SIZE),int(pos[1]/TILE_SIZE))

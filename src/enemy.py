@@ -11,8 +11,8 @@ class Enemy():
         self.tileMap = tileMap
         self.gravity = gravity
         self.dir = [1,0]
-        self.collision = [0,0,0,0]  #down,top,left,right
-                
+        self.collision = {"down":0,"top":0,"left":0,"right":0}    
+                    
         #animation
         self.flip = False    
         self.scale = (16, 20)  
@@ -45,7 +45,7 @@ class Enemy():
 
                  
     def update(self):
-        self.collision = [0,0,0,0]
+        self.collision = {"down":0,"top":0,"left":0,"right":0}
         
         self.changeDirCnt+=1
         
@@ -63,10 +63,10 @@ class Enemy():
         for rect in self.tileMap.getAroundTiles(self.rect.center):
             if(self.rect.colliderect(rect)):
                 if(self.dir[0] == 1):
-                    self.collision[3] = 1
+                    self.collision["right"] = 1
                     self.rect.right = rect.left
                 if(self.dir[0] == -1):
-                    self.collision[2] = 1
+                    self.collision["left"] = 1
                     self.rect.left = rect.right
                                       
         self.rect.y += self.speedY         
@@ -76,16 +76,16 @@ class Enemy():
         for rect in self.tileMap.getAroundTiles(self.rect.center):
             if(colRect.colliderect(rect)):
                 if(self.speedY >= 0):
-                    self.collision[0] = 1
+                    self.collision["down"] = 1
                     colRect.bottom = rect.top
                 if(self.speedY < 0):
-                    self.collision[1] = 1
+                    self.collision["top"] = 1
                     colRect.top = rect.bottom
                 self.rect = colRect
                 self.speedY = 0                     
                 
                         
-        if(not self.collision[0]):
+        if(not self.collision["down"]):
             self.speedY += self.gravity
             self.speedY = min(9,self.speedY)  
                

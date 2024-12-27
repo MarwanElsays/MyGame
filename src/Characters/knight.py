@@ -10,7 +10,7 @@ class Knight():
         self.__tile_map = tile_map
         self.__gravity = GRAVITY
         self.__dir = [0,0]
-        self.__collision = [0,0,0,0]  #down,top,left,right
+        self.__collision = {"down":0,"top":0,"left":0,"right":0}  #down,top,left,right
         
         #health
         self.__MAXHEALTH = 100
@@ -47,6 +47,7 @@ class Knight():
         self.__wepon:Weapon= None
         self.__equipping = False
         
+        #for debugging
         self.col = self.__rect
         
         self.colcnt = 0
@@ -93,7 +94,7 @@ class Knight():
                     
         if(keys[pygame.K_SPACE] and self.__jumps > 0 and self.__can_jump): 
             self.__speedY = -6*PSCALE
-            self.__collision[0] = 0
+            self.__collision["down"] = 0
             self.__jumps-=1
             self.__can_jump = False
             
@@ -112,8 +113,8 @@ class Knight():
     def get_animation(self):
              
         new_anim = ''
-        if(not self.__collision[0]):
-            if(any([self.__collision[2],self.__collision[3]])):
+        if(not self.__collision["down"]):
+            if(any([self.__collision["left"],self.__collision["right"]])):
                 if(self.__can_climb):
                     new_anim = 'idle'   # need to add climb animation
                 else:
@@ -154,10 +155,10 @@ class Knight():
             for rect in self.__tile_map.getAroundTiles(self.__rect.center):
                 if(self.__rect.colliderect(rect)):
                     if(self.__dir[0] == 1):
-                        self.__collision[3] = 1
+                        self.__collision["right"] = 1
                         self.__rect.right = rect.left
                     if(self.__dir[0] == -1):
-                        self.__collision[2] = 1
+                        self.__collision["left"] = 1
                         self.__rect.left = rect.right
                     self.col = rect
 
@@ -168,19 +169,19 @@ class Knight():
                     if(self.__speedY >= 0):
                         # print("tile   ",rect)
                         # print("my_rect",self.__rect)
-                        self.__collision[0] = 1
+                        self.__collision["down"] = 1
                         self.__rect.bottom = rect.top
                     if(self.__speedY < 0):
                         #print(self.__speedY)
-                        self.__collision[1] = 1
+                        self.__collision["top"] = 1
                         self.__rect.top = rect.bottom
                     self.__speedY = 1
                 
     def handle_collision(self):
-        if(self.__collision[1]):  #upWall bounce
+        if(self.__collision["top"]):  #upWall bounce
             self.__speedY+=2
         
-        if(self.__collision[2] or self.__collision[3]):
+        if(self.__collision["left"] or self.__collision["right"]):
             if(self.__speedY > 0):                           #handle wall slide      
                 self.__speedY = self.__WALLSLIDESPEED        #he can jump of wall when sliding
         
@@ -190,7 +191,7 @@ class Knight():
         else:
             self.__can_climb = False     #if player is not on left or right Wall then he cant climb
                    
-        if(self.__collision[0]): 
+        if(self.__collision["down"]): 
             self.__jumps = self.__MAXJUMPS  
             self.__speedY,self.__can_climb = 1,False     #prevent player from climbing when on ground
         elif(not self.__can_climb):
@@ -199,8 +200,8 @@ class Knight():
                                      
     def update(self):
         prev_col = self.__collision
-        self.__collision = [0,0,0,0]
-        
+        self.__collision = {"down":0,"top":0,"left":0,"right":0}
+
         self.get_input()
   
         self.__rect.x += self.__dir[0] * self.__speedX
@@ -218,7 +219,7 @@ class Knight():
                   
     def render(self,screen,offset):
                
-        #self.debug_rect(screen,offset)
+        # self.debug_rect(screen,offset)
         # print("my rect: ",self.__rect)
         # print("img_rect: ",self.__image[0].get_rect())
         #self.col_rect(screen,offset)
