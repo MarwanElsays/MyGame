@@ -1,5 +1,6 @@
 import pygame
 from animation import Animation
+from handleKeyBoard import HandleKeyBoardInput
 from utils import load_images
 from settings import PSCALE, SCALE,GRAVITY
 from weapon import Weapon
@@ -68,49 +69,53 @@ class Player():
     def get_equipping(self):
         return self.__equipping
     
-    def set_equipping(self,equipping):
-        self.__equipping = equipping
-
     def set_wepon(self,wepon):
         self.__wepon = wepon
-        
-            
+    
     def get_input(self):
         
         keys = pygame.key.get_pressed()
-        if(keys[pygame.K_RIGHT]): 
+        if keys[pygame.K_RIGHT]: 
             self.__dir[0] = 1
             self.__flip = False
-        elif(keys[pygame.K_LEFT]): 
+        elif keys[pygame.K_LEFT]: 
             self.__dir[0] = -1
             self.__flip = True 
         else:
             self.__dir[0] = 0
             
-        if(keys[pygame.K_UP]): 
+        if keys[pygame.K_UP]: 
             self.__can_climb = True
         else:
             self.__can_climb = False
             
-        if(keys[pygame.K_x] and self.__dir[0] != 0 and self.__can_slide):
+        if keys[pygame.K_x] and self.__dir[0] != 0 and self.__can_slide:
             self.__slide = 1
             self.__slide_cnt = 0
             self.__can_slide = False
         
-        if(keys[pygame.K_SPACE] and self.__jumps > 0 and self.__can_jump): 
+        if keys[pygame.K_SPACE] and self.__jumps > 0 and self.__can_jump: 
             self.__speedY = -6*PSCALE
             self.__collision[0] = 0
             self.__jumps-=1
             self.__can_jump = False
             
-        if(not keys[pygame.K_SPACE]):
+        if not keys[pygame.K_SPACE]:
             self.__can_jump = True
             
-        if(not keys[pygame.K_x]):
+        if not keys[pygame.K_x]:
             self.__can_slide = True
+            
+        if HandleKeyBoardInput.is_pressed(pygame.K_e):
+            self.__equipping = not self.__equipping
+            
+        if HandleKeyBoardInput.is_pressed(pygame.K_1):
+            self.launch_missile()
+            
+        HandleKeyBoardInput.updated_old_button_input_list([pygame.K_e,pygame.K_1])
                                
     def launch_missile(self):
-        if (self.__wepon is not None):
+        if self.__wepon is not None:
             self.__wepon.launch()    
                                 
     def get_animation(self):
