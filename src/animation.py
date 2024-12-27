@@ -22,6 +22,6 @@ class Animation:
         return int(self.imageIdx / self.frameDuration)
     
     def getImage(self):
-        img = self.images[int(self.imageIdx / self.frameDuration)]
-        return img
+        return self.images[self.get_anim_index()]
+        
     

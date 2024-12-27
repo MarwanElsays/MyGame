@@ -14,11 +14,15 @@ class tile:
 class tileMap:
     def __init__(self,path):
         self.map = {}
+        self.background = {} 
+        
         self.Tiles = []
+        self.backgroundTiles = []
         
         self.TilesImages = {
             "rockyGround" : load_images('tiles/rockyGround',scale=(TILE_SIZE,TILE_SIZE)),
             "Grass" : load_images('tiles/Grass',scale=(TILE_SIZE,TILE_SIZE)),
+            "Grass2" : load_images('tiles/Grass2',scale=(TILE_SIZE,TILE_SIZE)),
             "Chests" : load_images('chests',scale=(TILE_SIZE,TILE_SIZE)),
             "Alien" : load_images('tiles/Alien',(TILE_SIZE,TILE_SIZE)),
             "Lava": load_images('tiles/Lava',(TILE_SIZE,TILE_SIZE)),
@@ -28,17 +32,24 @@ class tileMap:
         
         print(len(self.map))
     
+    def getTiles(self,mp):
+        tiles = []
+        for tilesInfo in mp.values():
+            type,var,pos = tilesInfo.values()
+            newPos = (pos[0]*TILE_SIZE , pos[1]*TILE_SIZE)
+            tiles.append(tile(newPos,self.TilesImages[type][var]))
+        return tiles
+            
     def LoadMap(self,path):
         f = open(path, 'r')
         map_data = json.load(f)
         f.close()
-    
+
         self.map = map_data['tilemap']
-        for tilesInfo in self.map.values():
-            type,var,pos = tilesInfo.values()
-            newPos = (pos[0]*TILE_SIZE , pos[1]*TILE_SIZE)
-            self.Tiles.append(tile(newPos,self.TilesImages[type][var]))
-            
+        self.Tiles = self.getTiles(self.map)
+        self.background = map_data['backgroundTiles']
+        self.backgroundTiles = self.getTiles(self.background)
+                    
     def getAroundTiles(self,pos) -> list:
         rects = []
         cord = (int(pos[0]/TILE_SIZE),int(pos[1]/TILE_SIZE))       
@@ -60,4 +71,7 @@ class tileMap:
                 loc = str(x) + ';' + str(y)
                 if loc in self.map:
                     type,var,pos = self.map[loc].values()
+                    screen.blit(self.TilesImages[type][var], (pos[0] * TILE_SIZE - offset[0],pos[1] * TILE_SIZE - offset[1]))
+                if loc in self.background:
+                    type,var,pos = self.background[loc].values()
                     screen.blit(self.TilesImages[type][var], (pos[0] * TILE_SIZE - offset[0],pos[1] * TILE_SIZE - offset[1]))
