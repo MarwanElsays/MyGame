@@ -3,16 +3,16 @@ import pygame
 import pygame_gui
 from GameStates.gameState import GameState
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH
-from utils import Spritesheet, load_images
+from utils import SpriteSheet, load_images
 
 class MainMenuState(GameState):
     
-    def __init__(self, gameStatesManager, screen) -> None:
-        super().__init__(gameStatesManager,screen)
+    def __init__(self, game_statesManager, screen) -> None:
+        super().__init__(game_statesManager,screen)
         
         # Load a sound file
-        self.soundfile = "Assets/Sounds/buttonSelection.mp3" 
-        self.soundeffect = pygame.mixer.Sound(self.soundfile) 
+        self.sound_file = "Assets/Sounds/buttonSelection.mp3" 
+        self.sound_effect = pygame.mixer.Sound(self.sound_file) 
         
         #fonts
         self.font = pygame.font.Font('Assets/fonts/Evil_Empire.otf',9)
@@ -25,7 +25,7 @@ class MainMenuState(GameState):
                                                "C:/Users/MARWAN/Desktop/Programing/Python/srengaGame/Assets/uiThemes/theme.json")
         
         self.characters = {
-            'Knight': Spritesheet('knight/knightIdle.png','jsonImages/knight.json','#71664f',self.scale).get_first_image('knightIdle'),
+            'Knight': SpriteSheet('knight/knightIdle.png','jsonImages/knight.json','#71664f',self.scale).get_first_image('knightIdle'),
             'player': load_images('Player/idle',(self.scale[0]*16,self.scale[1]*20))[0]
         }
         
@@ -74,12 +74,12 @@ class MainMenuState(GameState):
                 sys.exit()    
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.button:
-                    self.soundeffect.play()
+                    self.sound_effect.play()
                     self.init_screen2()
                     print("moving from screen 1 to screen 2")
                 if event.ui_element == self.button1:
                     #self.button.hide()
-                    self.soundeffect.play()
+                    self.sound_effect.play()
                     pygame.quit()
                     sys.exit()
                           
@@ -107,12 +107,12 @@ class MainMenuState(GameState):
                         
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.button2:
-                    self.soundeffect.play()
-                    self.gameStatesManager.getRunningState().intiallize(self.characters_list[self.curr_character])
-                    self.gameStatesManager.setGameState(self.gameStatesManager.getRunningState())
+                    self.sound_effect.play()
+                    self.game_statesManager.getRunningState().intiallize(self.characters_list[self.curr_character])
+                    self.game_statesManager.setGameState(self.game_statesManager.getRunningState())
                     break                   
                 if event.ui_element == self.button3:
-                    self.soundeffect.play()
+                    self.sound_effect.play()
                     self.init_screen1()
                     print("moving from screen 2 to screen 1")
                     

@@ -6,27 +6,27 @@ from GameStates.runningState import RunningState
 class GameStatesManager:
     
     def __init__(self,screen) :
-        self.__mainMenuState = MainMenuState(self,screen)
-        self.__runningState = RunningState(self,screen)
+        self.__main_menu_state = MainMenuState(self,screen)
+        self.__running_state = RunningState(self,screen)
         self.__PauseState = PauseState(self,screen)
         #self.__PauseState.intiallize()
-        #self.__gameState:GameState = self.__PauseState
-        self.__gameState:GameState = self.__mainMenuState
+        #self.__game_state:GameState = self.__PauseState
+        self.__game_state:GameState = self.__main_menu_state
         
-    def setGameState(self,gameState):
-        self.__gameState = gameState
+    def setGameState(self,game_state):
+        self.__game_state = game_state
     
     def getGameState(self):
-        return self.__gameState
+        return self.__game_state
     
     def getMainMenuState(self):
-        return self.__mainMenuState
+        return self.__main_menu_state
     
     def getRunningState(self):
-        return self.__runningState
+        return self.__running_state
     
     def getPauseState(self):
         return self.__PauseState 
    
     def doAction(self,timeDelta):
-        self.__gameState.doAction(timeDelta)
+        self.__game_state.doAction(timeDelta)

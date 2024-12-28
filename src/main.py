@@ -11,13 +11,13 @@ class Game:
         pygame.display.set_caption("Seringa Game")
         self.clock = pygame.time.Clock()
         
-        self.gameStatesManager = GameStatesManager(self.screen)            
+        self.game_statesManager = GameStatesManager(self.screen)            
             
     def run(self): 
         
         while True:
             time_delta = self.clock.tick(60) / 1000.0
-            self.gameStatesManager.doAction(time_delta)
+            self.game_statesManager.doAction(time_delta)
             pygame.display.update()             
             
             

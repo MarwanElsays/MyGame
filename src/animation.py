@@ -2,26 +2,25 @@ import pygame
 
 
 class Animation:
-    def __init__(self,images,frameDuration,status=''):
+    def __init__(self, images, frame_duration, status=""):
         self.images = images
         self.status = status
-        self.frameDuration = frameDuration
-        self.imageIdx = 0
+        self.frame_duration = frame_duration
+        self.image_idx = 0
         self.done = False
-        self.animationDuration = len(self.images) * self.frameDuration
-    
+        self.animation_duration = len(self.images) * self.frame_duration
+
     def update(self):
-        self.imageIdx += 1
-        if(self.imageIdx == self.animationDuration):self.done = True
-        self.imageIdx %= self.animationDuration
-    
+        self.image_idx += 1
+        if self.image_idx == self.animation_duration:
+            self.done = True
+        self.image_idx %= self.animation_duration
+
     def is_animation_done(self):
         return self.done
-    
+
     def get_anim_index(self):
-        return int(self.imageIdx / self.frameDuration)
-    
-    def getImage(self):
+        return int(self.image_idx / self.frame_duration)
+
+    def get_image(self):
         return self.images[self.get_anim_index()]
-        
-    
